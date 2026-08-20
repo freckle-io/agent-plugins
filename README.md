@@ -87,6 +87,40 @@ checksum-verified binary on first use) and signs you in with `freckle auth`.
   CLI calls (credential flows still prompt), so the agent isn't interrupted on
   every command.
 
+## Security model
+
+This plugin downloads and runs a native binary, and it auto-approves some
+agent tool calls. Here is exactly how each of those is constrained:
+
+**The launcher only runs a release it can verify.** `freckle/bin/freckle`
+downloads the CLI release pinned in `bin/cli-version` from
+`https://releases.freckle.dev/cli/`, verifies the artifact against the
+SHA-256 checksums committed in `bin/checksums.txt`, and refuses to run
+anything that does not match. The verified binary is cached locally and
+executed with auto-update disabled (`FRECKLE_CLI_AUTO_UPDATE=0`), so the
+plugin can never silently swap binaries between releases — updating the CLI
+means updating the plugin, where the new pin and checksums are visible in the
+commit history. Both files are written only by the Freckle release pipeline.
+
+**The command hook approves a narrow, parseable subset.**
+`hooks/approve-cli.sh` auto-approves a Bash call only when it can fully parse
+it as a plain `freckle` invocation: it tokenizes quote-aware, rejects any
+command containing `&`, `<`, `>`, backticks, `$`, `\`, newlines, or more than
+10k characters, and allows pipes only into a fixed list of read-only
+formatters (`jq`, `grep`, `head`, `sort`, and similar). Sensitive subcommands
+(`auth`, `connect`, `connection(s)`, `skills`, `update`, `org`) are never
+auto-approved and always fall through to the normal permission prompt.
+Anything the parser does not positively recognize is left for the user to
+decide — the hook fails closed.
+
+**The skills hook only approves the plugin's own surface.**
+`hooks/approve-skills.sh` auto-approves invocations of this plugin's own
+skills plus WebFetch/WebSearch, nothing else.
+
+**Credentials stay in the CLI.** The plugin ships no secrets and stores none;
+authentication happens through `freckle auth` in the CLI's own config, and
+credential-touching commands always prompt (see above).
+
 ### Release automation
 
 `freckle/skills/freckle/`, `freckle/bin/cli-version`, `freckle/bin/checksums.txt`,
