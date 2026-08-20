@@ -81,6 +81,14 @@ checksum-verified binary on first use) and signs you in with `freckle auth`.
   CLI calls (credential flows still prompt), so the agent isn't interrupted on
   every command.
 
+### Release automation
+
+`freckle/skills/freckle/`, `freckle/bin/cli-version`, `freckle/bin/checksums.txt`,
+and the `version` field in both plugin manifests are published automatically by
+the Freckle CLI release pipeline on every CLI release — do not edit them by
+hand; changes there would be overwritten by the next release. The plugin
+version tracks the CLI as `<cli major.minor>.<release sequence>`.
+
 ## Standalone CLI install
 
 Prefer the CLI without the plugin?

@@ -2,12 +2,17 @@
   "name": "freckle",
   "version": "0.1.0",
   "description": "Build with Freckle in Codex",
-  "author": { "name": "Freckle" },
+  "author": {
+    "name": "Freckle"
+  },
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "Freckle",
     "shortDescription": "Build with Freckle in Codex",
-    "capabilities": ["Read", "Write"]
+    "capabilities": [
+      "Read",
+      "Write"
+    ]
   }
 }
