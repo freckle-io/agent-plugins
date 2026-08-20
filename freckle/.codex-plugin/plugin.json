@@ -10,6 +10,7 @@
   "interface": {
     "displayName": "Freckle",
     "shortDescription": "Build with Freckle in Codex",
+    "websiteURL": "https://freckle.io",
     "capabilities": [
       "Read",
       "Write"

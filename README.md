@@ -1,10 +1,16 @@
 <p align="center">
+  <a href="https://freckle.io">
+    <img src="./assets/freckle.png" alt="Freckle" height="72">
+  </a>
+</p>
+
+<p align="center">
   <strong>Build with Freckle in your AI coding agent</strong> — skills and the <code>freckle</code>
   CLI, for Claude Code and Codex.
 </p>
 
 <p align="center">
-  <a href="https://next.freckle.io">Freckle</a> · <a href="./GETTING_STARTED.md">Getting started</a>
+  <a href="https://freckle.io">freckle.io</a> · <a href="./GETTING_STARTED.md">Getting started</a>
 </p>
 
 Freckle is an AI-powered lead enrichment platform — build lists of companies and
@@ -102,3 +108,11 @@ On native Windows 11 x64:
 ```powershell
 irm https://install.freckle.io/install.ps1 | iex
 ```
+
+---
+
+<p align="center">
+  <a href="https://freckle.io">Website</a> ·
+  <a href="https://freckle.io/privacy-policy">Privacy policy</a> ·
+  <a href="https://freckle.io/terms-of-service">Terms of service</a>
+</p>

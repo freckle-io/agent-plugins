@@ -5,7 +5,7 @@
   "author": {
     "name": "Freckle"
   },
-  "homepage": "https://next.freckle.io",
+  "homepage": "https://freckle.io",
   "repository": "https://github.com/freckle-io/agent-plugins",
   "hooks": {
     "PreToolUse": [
