@@ -1,7 +1,7 @@
 {
   "name": "freckle",
   "version": "0.1.0",
-  "description": "Build with Freckle in Codex",
+  "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
   "author": {
     "name": "Freckle"
   },
@@ -10,7 +10,7 @@
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "Freckle",
-    "shortDescription": "Build with Freckle in Codex",
+    "shortDescription": "AI-powered list building, enrichment, and lead scoring from your coding agent.",
     "websiteURL": "https://freckle.io",
     "capabilities": [
       "Read",

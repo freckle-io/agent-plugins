@@ -1,6 +1,6 @@
 {
   "name": "freckle",
-  "description": "Build with Freckle in Claude Code",
+  "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
   "version": "0.1.0",
   "author": {
     "name": "Freckle"
