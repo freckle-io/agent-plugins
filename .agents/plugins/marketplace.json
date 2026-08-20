@@ -1,0 +1,15 @@
+{
+  "name": "freckle-plugins",
+  "interface": {
+    "displayName": "Freckle"
+  },
+  "plugins": [
+    {
+      "name": "freckle",
+      "source": {
+        "source": "local",
+        "path": "./freckle"
+      }
+    }
+  ]
+}

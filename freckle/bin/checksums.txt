@@ -1,0 +1,2 @@
+27d22883d2624615dfe2dd2c36d2251d7199a56c501fa72c40b8edaf3a14ef89  freckle-darwin-arm64
+ddd1b6a7afd9e374868465f9783af9ebe857be5c1772cb95af99ec20f4367daa  freckle-linux-x64
