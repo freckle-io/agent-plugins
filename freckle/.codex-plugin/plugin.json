@@ -5,6 +5,7 @@
   "author": {
     "name": "Freckle"
   },
+  "license": "MIT",
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
