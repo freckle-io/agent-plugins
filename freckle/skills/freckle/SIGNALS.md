@@ -56,21 +56,29 @@ freckle signals create <input-dataset-id> <output-dataset-id> \
 
 For full control, pass a single value containing quotes, parentheses, or `AND`/`OR`/`NOT`; it is sent as a raw boolean expression where multi-word titles must be double-quoted, e.g. `--job-titles '("Staff Engineer" OR "Principal Engineer") AND NOT "Manager"'`.
 
-Contact job-change monitoring also requires a company domain and at least one contact identifier. Supply any combination of contact email, profile URL, and full name pointers:
+Contact job-change monitoring requires a company domain and a contact LinkedIn profile URL — job-change detection quality drops sharply without the profile URL. Contact email and full name pointers are optional supplements:
+
+When you turn this signal on, Freckle runs an initial scan across your entire dataset to find anyone whose current job differs from your records, then keeps monitoring for changes going forward – each job change found is charged.
 
 ```bash
 freckle signals create <input-dataset-id> <output-dataset-id> \
   --signal-type contact_job_changes \
   --company-domain-path /company/domain \
-  --contact-email-path /contact/email \
-  --contact-profile-url-path /contact/linkedinUrl
+  --contact-profile-url-path /contact/linkedinUrl \
+  --contact-email-path /contact/email
 ```
 
-Before creating any Signal, always ask the user exactly: **“Include results from last 24 hours?”** Do not infer or
-default their answer, even if every other creation detail is known. If they answer yes, pass `--include-last-24-hours`;
-if they answer no, omit it. The flag includes qualifying events from the 24 hours before each monitor was created. If
-provider submission occurs more than 24 hours later, the cutoff is limited to the rolling 24 hours before submission.
-Without the flag, only events after provider creation qualify. Initial findings can arrive asynchronously.
+When the input Dataset lacks a LinkedIn profile URL column, add an enrichment step to the Workbook's Workflow that populates it, run that enrichment, and only then create the Signal. Entries whose profile URL is still blank at provisioning time fail as source-data exceptions instead of being monitored.
+
+Before creating any Signal other than contact job changes, always ask the user exactly: **“Include results from last 24 hours?”**
+Do not infer or default their answer, even if every other creation detail is known. If they answer yes, pass
+`--include-last-24-hours`; if they answer no, omit it. The flag includes qualifying events from the 24 hours before each
+monitor was created. If provider submission occurs more than 24 hours later, the cutoff is limited to the rolling 24
+hours before submission. Without the flag, only events after provider creation qualify. Initial findings can arrive
+asynchronously.
+
+Contact job-change Signals do not support lookback. Do not ask the lookback question or pass
+`--include-last-24-hours` when `--signal-type contact_job_changes` is selected.
 
 Both Datasets must be active, distinct, and in the same Workbook. Creation prints the Signal Provider Configuration id and a `signals get` command. It is asynchronous and may take up to 3 hours; Freckle emails the user when the Signal launches and when its first event arrives.
 

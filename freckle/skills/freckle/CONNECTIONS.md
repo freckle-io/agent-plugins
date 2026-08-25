@@ -43,7 +43,7 @@ freckle connections connect apify
 
 The command prints the URL and tries to open a browser.
 
-Apollo Find People currently uses Freckle-provided access and does not require a customer Apollo connection or `credentialId`; see [workflow/apollo-find-people.md](workflow/apollo-find-people.md).
+Both Apollo Find People nodes use Freckle-provided access and do not require a customer Apollo connection or `credentialId`; see [workflow/apollo-find-people.md](workflow/apollo-find-people.md).
 
 ## Custom HTTP APIs
 

@@ -1,6 +1,13 @@
 # Apollo Find People
 
-Read this reference whenever `apolloFindPeople` is planned, added, or reconfigured.
+Read this reference whenever `apolloFindPeopleBasic` or `apolloFindPeople` is planned, added, or reconfigured.
+
+## Choose basic or enriched
+
+- **Basic — `apolloFindPeopleBasic`** calls only Apollo's people search API. It returns first name, obfuscated last name, title, availability flags, and basic organization data. Its catalog price is 0 credits and successful runs record no Freckle credit usage.
+- **Enriched — `apolloFindPeople`** searches first, then bulk-enriches the people Apollo found. It can return full identity, contact, profile, employment, location, and organization fields. Its catalog price applies per successfully enriched person; missing enrichments are free.
+
+Use Basic when its fields satisfy the downstream work. Use Enriched only when the user needs fields that Apollo search does not reveal. There is no standalone Apollo Enrich Person node and no per-person enrichment follow-up to plan.
 
 ## Decide the role
 
@@ -15,13 +22,15 @@ Before freezing the plan, ask how many people Apollo should return for each sear
 
 ## Credit maximum
 
-Apollo Find People's catalog `creditCost` is the price per billable person returned. Carry its per-input maximum as `creditCost × request.numResults`. For a run of known size, the maximum is `creditCost × request.numResults × input entries`; the actual charge follows the people returned and can be 0 when Apollo finds none.
+Apollo Find People (Basic) is always 0 credits. Apollo Find People (Enriched) has a catalog `creditCost` per billable person returned. Carry the enriched node's per-input maximum as `creditCost × request.numResults`. For a run of known size, the maximum is `creditCost × request.numResults × input entries`; the actual charge follows the people enriched and can be 0 when Apollo finds none.
 
 ## Contract and behavior
 
-Inspect the full current catalog entry first:
+Inspect the full current catalog entry for the selected mode first:
 
 ```bash
+freckle workflow node inspect apolloFindPeopleBasic
+# or
 freckle workflow node inspect apolloFindPeople
 ```
 
@@ -46,7 +55,7 @@ The exact supported `request` keys are:
 
 Endpoint references bind whole values. When Workflow inputs do not already form the complete request object, construct it in a JavaScript transform node and bind that single value.
 
-Apollo Find People runs on Freckle-provided Apollo access; there is no customer Apollo connection or `credentialId` to ask the user about.
+Both Apollo Find People nodes run on Freckle-provided Apollo access; there is no customer Apollo connection or `credentialId` to ask the user about.
 
 ## Handoff through Push to Dataset
 
@@ -55,6 +64,7 @@ Read [push-to-dataset.md](push-to-dataset.md), then bind the complete array dire
 ```yaml
 nodes:
   findPeople:
+    # Use apolloFindPeopleBasic for free search-only results.
     uses: apolloFindPeople@<inspected-version>
     config: {}
     with:
@@ -74,12 +84,13 @@ outputs:
     from: $nodes.pushPeople.result
 ```
 
-Push the person objects unchanged. Use the inspected `people` item contract to understand the available identity, contact, role, location, profile, organization, account, phone, employment-history, and intent fields. Catalog the fields required by the described downstream Workflow. When no downstream use is known yet, catalog the useful identity/contact/company fields such as `id`, `full_name`, `first_name`, `last_name`, `email`, `email_status`, `title`, `seniority`, `linkedin_url`, organization name/domain, and location.
+Push the person objects unchanged. Use the selected node's inspected `people` item contract to understand the available fields. Basic results expose search fields such as `id`, `first_name`, `last_name_obfuscated`, `title`, availability flags, and basic organization data. Enriched results can additionally expose identity, contact, role, location, profile, organization, account, phone, employment-history, and intent fields. Catalog only fields present in the selected contract and required by the described downstream Workflow.
 
 **Completion** — every box checked:
 
 - [ ] Apollo's role is explicitly evidence or handoff.
+- [ ] Basic or Enriched is explicitly chosen from the fields the user needs.
 - [ ] An unspecified result count was asked about and resolved.
-- [ ] Apollo's per-billable-person price and `request.numResults` maximum are in the Credit Cost Summary.
+- [ ] Basic is quoted as 0 credits, or Enriched's per-billable-person price and `request.numResults` maximum are in the Credit Cost Summary.
 - [ ] The full node contract was inspected and its version pinned.
-- [ ] A handoff has, in the plan: a same-Workbook Push destination, the complete-person binding, a field catalog, the Push receipt output, and any user-described downstream connections.
+- [ ] A handoff has, in the plan: a same-Workbook Push destination, the complete `people` array binding, a field catalog, the Push receipt output, and any user-described downstream connections.

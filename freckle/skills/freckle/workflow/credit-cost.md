@@ -40,7 +40,7 @@ Report:
 - any uncapped per-result formula that prevents a finite maximum;
 - any usage-priced node and its post-run calculation that prevents a finite maximum;
 - that averages and forecasts become eligible after the first 10 input rows’ runs reach terminal states and require trustworthy actual sample credits; and
-- which before/after usage scope from [CREDITS.md](../CREDITS.md#sample-credit-evidence) will measure the sample, or that concurrent aggregate activity prevents trustworthy attribution.
+- that the exact admitted Workflow Run IDs will be kept for the sample evidence defined in [CREDITS.md](../CREDITS.md#sample-credit-evidence), naming an aggregate fallback scope only when exact Run evidence will be unavailable.
 
 Label every user-facing credit amount **credits**. Describe per-result and provider-usage formulas in plain language when needed, without exposing the catalog's billing-model labels. State that a finite maximum is an upper bound at current prices, not a range or a guaranteed charge; a row may use 0 credits. Authenticated dollar equivalents follow the rules below.
 
@@ -50,15 +50,15 @@ After the first 10 input rows’ runs reach terminal states, return this heading
 
 **Credit Forecast Summary**
 
-An observed forecast requires actual sample credits from isolated before/after usage snapshots for those 10 rows. Settle the baseline before admission and follow [CREDITS.md](../CREDITS.md#sample-credit-evidence); after every sample run reaches a terminal state, settle the final snapshot and subtract the baseline from its exact `creditsConsumed` total. When the report scope stayed isolated, report:
+An observed forecast requires actual sample credits for those 10 rows. Follow [CREDITS.md](../CREDITS.md#sample-credit-evidence): keep their exact Workflow Run IDs, wait until every selected run reaches a terminal state, then inspect and sum their exact `creditsConsumed`. Report:
 
 - sample size and actual sample credits;
 - average credits per row (`sample credits ÷ 10`); and
 - for a fixed Dataset, forecast total credits (`average credits per row × row count`).
 
-Label this as a sample-based forecast, not a guarantee. Use the isolated aggregate delta as the sole observed-spend source; outputs, selected branches, catalog maximums, and a zero lower bound remain planning context.
+Label this as a sample-based forecast, not a guarantee. Use the per-run total as the observed-spend source; outputs, selected branches, catalog maximums, and a zero lower bound remain planning context.
 
-When no baseline was captured, the rollup has not landed, or unrelated work shares the report scope, the **Credit Forecast Summary** states that trustworthy sample attribution is unavailable, then repeats the planning maximum for context and labels it as a maximum rather than an observed forecast.
+When exact Run evidence is unavailable, apply the aggregate fallback in `CREDITS.md`. If no baseline was captured, the aggregate has not recorded the sample, or unrelated work shares the report scope, the **Credit Forecast Summary** states that trustworthy sample attribution is unavailable, then repeats the planning maximum for context and labels it as a maximum rather than an observed forecast.
 
 ## Dollar equivalents
 
@@ -66,4 +66,4 @@ Add dollars only when an authenticated product response supplies the user's plan
 
 The current CLI does not expose the user's plan-specific rate. State that dollar equivalents are unavailable from the current CLI; never infer a rate from plan names, public pricing, or generic assumptions.
 
-**Completion:** the plan has one **Credit Cost Summary** based on a verified maximum, an explicit uncapped formula, or an explicit post-run provider-usage calculation; after the first 10 input rows’ runs reach terminal states, one **Credit Forecast Summary** reports an isolated actual sample-credit delta or the explicit attribution limitation; credit-cost quantities use the label “credits,” while authenticated plan-rate dollar equivalents remain allowed; no per-data-point credit allocation or unsupported range appears; and total dollars appear only for a fixed Dataset size.
+**Completion:** the plan has one **Credit Cost Summary** based on a verified maximum, an explicit uncapped formula, or an explicit post-run provider-usage calculation; after the first 10 input rows’ runs reach terminal states, one **Credit Forecast Summary** reports the exact per-run sample-credit total, a trustworthy aggregate fallback, or the explicit attribution limitation; credit-cost quantities use the label “credits,” while authenticated plan-rate dollar equivalents remain allowed; no per-data-point credit allocation or unsupported range appears; and total dollars appear only for a fixed Dataset size.

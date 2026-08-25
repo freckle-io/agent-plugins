@@ -1,17 +1,19 @@
 # List Building
 
-A List is a Workbook whose Dataset is filled by a backend-owned import from a provider search. The backend owns search paging, imports, checkpoints, and resume behavior. Drive it with `list` commands; do not assemble a Workflow or Dataset connection for the import itself — the [enriched people follow-up](#enriched-people-follow-up) adds them afterwards.
+A List is a Workbook whose Dataset is filled by a backend-owned import from a provider search. The backend owns search paging, imports, checkpoints, and resume behavior. Drive it with `list` commands; do not assemble a Workflow or Dataset connection for the import itself — follow-ups come afterwards through [From List to Workbook](#from-list-to-workbook).
 
 ## Providers
 
-| Provider | Entity | Build command | Filters and preview |
-| --- | --- | --- | --- |
-| AI Ark | companies | `freckle list build ai-ark companies` | [AI Ark companies](#ai-ark-companies) |
-| AI Ark | people | `freckle list build ai-ark people` | [AI Ark people](#ai-ark-people) |
-| Apollo | companies | `freckle list build apollo companies` | [Apollo companies](#apollo-companies) |
-| Apollo | people | `freckle list build apollo people` | [Apollo people](#apollo-people) |
+Every provider follows the same lifecycle below. Each provider guide owns its example command, filter vocabulary, constraints, preview shape, and cost line — load the pinned provider's guide before composing any build or preview command.
 
-Every provider follows the same lifecycle below; the provider's section owns its filter vocabulary, constraints, and preview shape.
+| Provider | Entity | Build command | Stands out for | Each imported row holds | Cost shape | Guide |
+| --- | --- | --- | --- | --- | --- | --- |
+| Apollo | companies | `freckle list build apollo companies` | technology and keyword targeting, revenue ranges | a normalized company record | billed per non-empty search page | [Apollo companies](list/apollo-companies.md) |
+| Apollo | people | Basic: `freckle list build apollo people`; Enriched: `freckle list build apollo people enriched` | title, seniority, and location prospecting with a Basic or Enriched mode | a search-only prospect or a successfully enriched person, depending on the command | free Basic import; Enriched billed per returned person | [Apollo people](list/apollo-people.md) |
+| AI Ark | companies | `freckle list build ai-ark companies` | lookalike-domain search, industry and founded-year filters, smart matching | every available company field, including technologies | billed per non-empty search page | [AI Ark companies](list/ai-ark-companies.md) |
+| AI Ark | people | `freckle list build ai-ark people` | skill, seniority, and profile-badge filters with smart matching | a rich full profile with nested current-company data at import time | API-reported estimate | [AI Ark people](list/ai-ark-people.md) |
+
+When the request names no provider, present the matching entity rows from this table in plain language and recommend one inside the batch grill — the "Stands out for", row-contents, and cost-shape differences are the decision material.
 
 ## Pin the request
 
@@ -24,28 +26,30 @@ Resolve and pin the org by the shared rules in [SKILL.md](SKILL.md#shared-operat
 - the requested entry limit; and
 - whether the user wants provider work to start after creation.
 
-Show those choices in a compact filter table that includes the cost line from the provider's section. Ask for plan approval and the preview-or-create choice in one response. Recommend previewing 10 matching entries and give exactly these two selectable replies:
+Show those choices in a compact filter table that includes the cost line from the provider's guide. Ask for plan approval and the preview-or-create choice in one response, phrased as one natural question a colleague would ask — the two paths woven into the sentence, the recommendation stated in passing, and an open invitation to tweak the plan. The question offers two paths:
 
-- `approve and preview` **(recommended)** — approve this exact plan and preview 10 matching entries; and
-- one immediate-action label matching the pinned run intent: `approve and create` when the pinned run intent is create-only, or `approve, create, and run` when the pinned run intent includes starting the import.
+- **preview first (recommended)** — approve this exact plan and preview 10 matching entries before committing to the full import; and
+- the one immediate action matching the pinned run intent — create the list now when the pinned run intent is create-only, or create it and start the import when the pinned run intent includes starting the import.
 
-A sufficient response unambiguously names either `approve and preview` or the one immediate-action label shown. When the response names neither label, keep the gate open and ask the user to reply with one of them. If the user revises the plan, show the revised table and the same combined choice again. Preview, creation, and provider work wait for this combined approval. `list inspect` is read-only and can run before approval when the user names an existing List Workbook.
+For example: "Want me to pull a quick preview of 10 matches first — that's what I'd do — or create the list and import all 1,000 right away? If anything in the plan needs a tweak, just say the word." A sufficient reply unambiguously picks one offered path: "preview it first" or "skip the preview and start the import" both work. When a reply approves without picking a path — "yes", "go ahead" — keep the gate open and ask which path in one short question. A reply that revises the plan and carries a direction — "tweak X and preview again", "tighten the filters and try again" — is itself sufficient: apply the revision and continue down that path in the same turn, showing the revised filter table with the result instead of stopping for fresh approval. Only a revision with no direction shows the revised table and asks the combined choice once. Preview, creation, and provider work wait for this combined approval. `list inspect` is read-only and can run before approval when the user names an existing List Workbook.
 
-AI Ark people always follows its command's preview-first path. For that provider/entity, offer `approve and preview` as the only initial action; creation and run choices wait for the returned preview.
+AI Ark people always follows its command's preview-first path. For that provider/entity, offer the preview as the only initial path; creation and run choices wait for the returned preview.
 
 ## Build
 
-Compose the build command from the provider's section — its example command, filters, and constraints are authoritative. `--name`, `--description`, `--limit`, `--preview`, `--run-request-id`, and `--run` are shared build flags for every provider. Creation requires a non-blank plain-language Workbook description; pass the approved value with `--description`. Preview creates no Workbook and does not require it. Never combine `--preview` with `--run`.
+Compose the build command from the provider's guide — its example command, filters, and constraints are authoritative. `--name`, `--description`, `--limit`, `--preview`, `--run-request-id`, and `--run` are shared build flags for every provider. Creation requires a non-blank plain-language Workbook description; pass the approved value with `--description`. Preview creates no Workbook and does not require it. Never combine `--preview` with `--run`.
 
-For the advanced backend filter shape, write the `filters` object accepted by the provider's command to an absolute `.json` path and pass `--search-file <path>`. A search file and inline filter flags are alternative inputs; use exactly one style. AI Ark people additionally accepts the same complete filter object as inline JSON through `--input`.
+For the advanced backend filter shape, write the `filters` object accepted by the provider's command to an absolute `.json` path and pass `--search-file <path>`. A search file and inline filter flags are alternative inputs; use exactly one style per the provider guide.
 
 Creation is not idempotent. If its transport outcome is uncertain, do not repeat the build command until you confirm whether the named Workbook was created. When creation also uses `--run`, use a stable `--run-request-id` and keep it until the run outcome is certain.
 
 ## Approved preview or immediate creation
 
-The immediate-action label authorizes only the pinned create-only or create-and-run intent named by that label. For `approve and preview`, run the exact approved filters and requested `--limit` with `--preview`. Preview makes one synchronous, server-sized provider search and creates no Workbook, Dataset, Dataset Source, or import run. Show every returned normalized entry in a compact Markdown table. For Apollo and AI Ark, show the returned `totalEntries` and `estimatedCreditCost`: `totalEntries` is the provider's full matching total independent of the requested limit and can exceed the 50,000-entry import cap; `estimatedCreditCost` is the backend-calculated customer-facing cost for the requested limit. Use both returned values directly; do not recalculate them.
+An immediate-action choice authorizes only the pinned create-only or create-and-run intent. For a preview choice, run the exact approved filters and requested `--limit` with `--preview`. Preview makes one synchronous, server-sized provider search and creates no Workbook, Dataset, Dataset Source, or import run. Show every returned normalized entry in a compact Markdown table. For Apollo and AI Ark, show the returned `totalEntries` and `estimatedCreditCost`: `totalEntries` is the provider's full matching total independent of the requested limit and can exceed the 50,000-entry import cap; `estimatedCreditCost` is the backend-calculated customer-facing cost for the requested limit. Use both returned values directly; do not recalculate them.
 
-After showing the approved preview, ask for informed approval before full creation or import. Offer an explicit action label matching the already-pinned run intent—`create list` for create-only or `create and run` for starting the import—plus `stop`. Only after that post-preview approval, run the approved build command without `--preview`, adding `--run` and a stable `--run-request-id` for `create and run`. On `stop`, end the route without creating the list.
+Preview is an iteration loop, not a one-shot gate. When the user reacts to a preview by asking for tweaks or better matches — "let's get more of these to be churches" — they are still on the preview path: apply the tweaks and run the revised preview in the same turn, showing the revised filters alongside the new entries. Creation and import are the only actions that wait for an explicit go-ahead.
+
+After showing a preview the user is happy with, ask for informed approval before full creation or import — again one natural question, offering to go ahead with the already-pinned run intent (create the list, or create it and start the import) or to stop here. Only after an unambiguous go-ahead, run the approved build command without `--preview`, adding `--run` and a stable `--run-request-id` when the pinned intent starts the import. A reply that stops ends the route without creating the list.
 
 CLI-generated run request IDs are retry-stable, but explicit IDs make an agent handoff reproducible.
 
@@ -67,111 +71,29 @@ Poll while status is `queued` or `running`. Stop on `completed` or `failed`. Rep
 
 AI Ark reports `currentPage` and `nextPage` as zero-based provider page indexes. Apollo preserves its existing one-based checkpoint reporting. In both cases, print the returned values without conversion.
 
-For a completed Apollo list, use the returned `datasetId` with `workbook dataset entry list <workbook-id> <dataset-id> --limit 100` and follow `nextCursor` pages. For a completed AI Ark company list, use `workbook dataset entry list <workbook-id> <dataset-id> --ai-ark-companies --limit 100`; this API-backed projection retains every available company field except the potentially large `technologies` array in both table and `--json` output, while the stored Dataset Entry remains complete. Follow `nextCursor` pages. The created asset handed to the user is the Workbook:
+For a completed list, page entries with `workbook dataset entry list <workbook-id> <dataset-id> --limit 100` using the returned `datasetId`, following `nextCursor` pages; the AI Ark guides name compact projection flags for their large stored payloads. The created asset handed to the user is the Workbook:
 
 `[<list name>](https://next.freckle.io/workbooks/<workbook-id>)`
 
-## Apollo companies
+## From List to Workbook
 
-The primary command is:
+A completed List is a normal Workbook whose Dataset holds the imported rows, so everything Freckle can do with a Workbook now applies to it. Deliver the Workbook link with the final import status, and in the same message offer the follow-ups that fit the imported entity — the route ends when the user has chosen a next step or declined one, not at the link. In plain language, offer:
 
-```bash
-freckle list build apollo companies \
-  --name "San Francisco Companies" \
-  --description "Companies in San Francisco that match the approved prospecting criteria" \
-  --location "San Francisco" \
-  --min-employees 101 \
-  --max-employees 500 \
-  --limit 1000
-```
+- **People lists** — find verified work emails or mobile numbers, find LinkedIn profiles, validate emails, score the people, or send them to a connected tool such as HubSpot, Instantly, or HeyReach. For a new Apollo List that needs full last names, LinkedIn URLs, or emails at import time, choose the [Enriched List command](list/apollo-people.md#cost-line).
+- **Company lists** — find people at the imported companies, enrich or score the companies, send them to a connected tool, or monitor them for new hires with [Dataset Signals](SIGNALS.md).
 
-Available inline filters are `--company-name`, repeatable `--domain`, repeatable `--location`, repeatable `--excluded-location`, `--min-employees`, `--max-employees`, repeatable `--technology`, repeatable `--keyword`, `--min-revenue`, and `--max-revenue`. Always supply `--min-employees` and `--max-employees` together because Apollo accepts only bounded employee-count ranges; search-file `employeeCountRanges` likewise require both `min` and `max`. `--limit` accepts 1–50,000 companies. When omitted, Apollo imports all provider matches up to the 50,000-entry import cap.
+Present these as possibilities, not promises: which fields come back depends on the providers chosen in that follow-up.
 
-Apollo's preview returns 10 normalized companies.
-
-Company Search bills one page charge per committed non-empty provider page of up to 100 companies; pages returning no companies cost nothing. An explicit limit costs at most `ceil(requested limit ÷ 100)` page charges; with no limit, the preview estimates `ceil(min(totalEntries, 50,000) ÷ 100)` page charges. State that structure in the plan's cost line. Quote a credit figure only from the backend: show its `estimatedCreditCost` rather than pricing the page charge yourself.
-
-## AI Ark companies
-
-The primary command is:
-
-```bash
-freckle list build ai-ark companies \
-  --name "India Software Companies" \
-  --description "Software companies in India that match the approved prospecting criteria" \
-  --location "India" \
-  --industry "Software Development" \
-  --min-employees 101 \
-  --max-employees 500 \
-  --limit 1000
-```
-
-Available inline filters are repeatable `--lookalike-domain`, `--domain`, `--location`, `--industry`, `--keyword`, and `--technology`; `--company-name`; paired `--min-employees` and `--max-employees`; paired `--min-revenue` and `--max-revenue`; and paired `--min-founded-year` and `--max-founded-year`. `--lookalike-domain` accepts at most 5 values. AI Ark's page/import maximum is 50,000 companies, `--limit` accepts 1–50,000, and preview returns up to 10 normalized companies. When `--limit` is omitted, AI Ark imports all provider matches up to the 50,000-entry cap.
-
-Inline name, industry, keyword, and technology filters use the command's common AI Ark smart-match defaults. Use `--search-file` for precise any/all, include/exclude, match-mode, keyword-source, multiple-range, or `advancedAccountFilters` JSON. The file contains the complete AI Ark `filters` object with optional `lookalikeDomains`, `account`, and `advancedAccountFilters`; a search file and inline flags remain alternative styles.
-
-AI Ark preview returns every available normalized company field except `technologies`, in stable table columns or JSON, plus the provider-reported `totalEntries` and backend-calculated `estimatedCreditCost`. Company Search bills 1.8 credits per committed non-empty provider page of up to 100 companies; pages returning no companies cost nothing. An explicit limit costs at most `1.8 × ceil(requested limit ÷ 100)` credits; with no limit, the preview estimates `1.8 × ceil(min(totalEntries, 50,000) ÷ 100)` credits. Report both returned fields directly, using the backend estimate rather than recalculating it.
-
-## AI Ark people
-
-Use AI Ark People Search directly for rich base profiles and their nested current-company data. For example:
-
-```bash
-freckle list build ai-ark people \
-  --name "India RevOps Leaders" \
-  --description "Revenue Operations leaders at software companies in India" \
-  --title "Revenue Operations" \
-  --location "India" \
-  --company-industry "Software Development" \
-  --limit 1000 \
-  --run
-```
-
-Available inline contact filters are repeatable `--full-name`, `--linkedin-url`, `--location`, `--title`, `--seniority`, `--skill`, and `--profile-badge`. Current-company filters are repeatable `--company-domain`, `--company-location`, and `--company-industry`, plus paired `--min-employees` and `--max-employees`. Inline text filters use AI Ark smart matching. `--limit` accepts 1–50,000 people and defaults to 100.
-
-Use `--input '<json>'` or `--search-file <path>` for the complete product filter object with optional `account`, `contact`, `advancedAccountFilters`, and `advancedContactFilters`. Inline flags, `--input`, and `--search-file` are three alternative input styles; preserve the approved nested object exactly.
-
-The command always previews up to 10 people before creation. Its default table and JSON previews contain only `id`, `fullName`, `title`, `company`, `location`, and `linkedin` for each person, plus the provider's full `totalEntries`, the requested import count as `requestedEntries`, and the API-returned customer-facing `estimatedCreditCost`. Show all three totals directly. Use `--raw` only when the complete provider preview records are explicitly needed; it does not change the full records written by the import. The API currently returns `estimatedCreditCost: 0` until a canonical Freckle pricing rule exists; do not describe People Search as free or substitute provider-side pricing.
-
-After the skill's post-preview approval, rerun the exact command without `--preview` and add `--yes`; add `--run` and a stable `--run-request-id` only for approved create-and-run intent. `--yes` bypasses the CLI prompt, not the user approval gate. A decline or `stop` ends without creating resources. This List contains the base People Search payload only: Email Finder and mobile finder are separate future enrichments and stay out of this command.
-
-Completed AI Ark people entries retain the full person and nested company payload. List a compact read-only view with `freckle workbook dataset entry list <workbook-id> <dataset-id> --ai-ark-people`; add `--json` for compact structured values and follow `nextCursor` pages. Omit `--ai-ark-people` only when the complete stored Dataset Entry payload is explicitly needed.
-
-## Apollo people
-
-Use Apollo People Search directly; do not search for companies first. For example:
-
-```bash
-freckle list build apollo people \
-  --name "San Francisco RevOps People" \
-  --description "Revenue Operations leaders in San Francisco for outbound prospecting" \
-  --title "RevOps" \
-  --location "San Francisco" \
-  --limit 1000
-```
-
-Available inline filters are repeatable `--title`, repeatable `--location`, repeatable `--excluded-title`, repeatable `--excluded-location`, repeatable `--seniority`, `--keyword`, repeatable `--company-domain`, repeatable `--company-location`, and `--strict-titles`. Apollo expands similar titles by default; `--strict-titles` disables that expansion. `--limit` accepts 1–50,000 people and defaults to 100.
-
-People Search returns search-only prospect records. The people cost line is a mode choice; show both modes with the plan table. For people, a sufficient combined-gate reply names both a mode and a label; when either is missing, keep the gate open and ask for the missing piece:
-
-- `basic` — the List's Dataset shows first name, an obfuscated last name such as `J********`, job title, and company name. This import costs 0 credits and records no Freckle credit usage.
-- `enriched` — the same basic List plus the [enriched people follow-up](#enriched-people-follow-up); costs the `apolloEnrichPerson` catalog `creditCost` per person Apollo successfully finds (a person the node cannot find costs nothing), so one enrichment pass costs at most that price × imported rows. Read the current price with `freckle workflow node inspect apolloEnrichPerson` before quoting it. Fields such as full last name, LinkedIn URL, email address, and company domain are returned only when Apollo has them — present them as possible outcomes, never promised columns.
-
-The enrichment Workflow enters only through the `enriched` choice or a later explicit user request via [REFINE.md](REFINE.md).
-
-Apollo's preview returns 10 normalized people showing the basic fields only — name with an obfuscated last name, title, and organization — and costs 0 credits.
-
-### Enriched people follow-up
-
-Run the basic route above to `completed` first and note `importedEntries` — the inspected per-person price caps one pass at that count. Then follow [REFINE.md](REFINE.md) against the created List Workbook: inspect the node contract first (`workflow node inspect apolloEnrichPerson`), author a Workflow whose provider node is `apolloEnrichPerson@<inspected-version>` (pin the version the inspect returns) with a Workflow input bound to the node's `personId` port, connect the List's Dataset as the connection input mapping the hidden `Apollo person ID` field (`apollo-id`, row path `/id`) to that input, and let the connection write results to its own separate output Dataset — the basic List Dataset is never modified. Run through the sample gate: trigger the first 10 rows (`--limit 10` — [WORKBOOKS.md#pending-and-triggering](WORKBOOKS.md#pending-and-triggering)), show their terminal results with the Credit Forecast Summary ([credit-cost.md](workflow/credit-cost.md)), and ask before running the rest.
+A chosen follow-up treats the List Workbook as an existing target: follow [REFINE.md](REFINE.md) against it. The follow-up shape holds for every provider: inspect the chosen node contracts, author the Workflow, connect the List's Dataset as the connection input, and let the connection write results to its own separate output Dataset — the imported List Dataset is never modified. Every follow-up run goes through the sample gate ([WORKBOOKS.md#pending-and-triggering](WORKBOOKS.md#pending-and-triggering)).
 
 **Completion** — every box checked:
 
 - [ ] One unambiguous initial response approved the org, list name, provider, filters, requested limit, and run intent and selected either the recommended 10-entry preview or the one immediate action matching that run intent.
-- [ ] The exact approved filters were sent with `--preview` only after `approve and preview`; every returned compact preview entry, `totalEntries`, and `estimatedCreditCost` were shown.
-- [ ] After a preview, an explicit `create list` or `create and run` response approved full creation or import; `stop` ended the route without creation.
-- [ ] Immediate creation followed only the combined gate's run-intent-specific label; post-preview creation followed only the distinct informed approval.
+- [ ] The pinned provider's guide was loaded before any build or preview command was composed.
+- [ ] The approved filters — or their user-directed revisions — were sent with `--preview` only after the user chose the preview path; every returned compact preview entry, `totalEntries`, and `estimatedCreditCost` were shown for each preview.
+- [ ] After a preview, an unambiguous go-ahead approved full creation or import; a stop ended the route without creation.
+- [ ] Immediate creation followed only the combined gate's unambiguous run-intent choice; post-preview creation followed only the distinct informed approval.
 - [ ] Every run used a stable request ID retained through any uncertain transport outcome, and no uncertain create was repeated before checking for its Workbook.
 - [ ] Every started import reached `completed` or `failed`, and only returned status, progress, and public failure fields were reported.
-- [ ] Completed results were inspected from the returned Dataset and the created Workbook was linked.
-- [ ] For Apollo people, the combined gate resolved the `basic` or `enriched` choice explicitly before creation, and an `enriched` choice followed the enriched people follow-up through the sample gate.
+- [ ] Completed results were inspected from the returned Dataset, and the created Workbook link was delivered together with the entity's follow-up offers; a chosen follow-up routed through [REFINE.md](REFINE.md) (or [SIGNALS.md](SIGNALS.md) for monitoring).
+- [ ] For Apollo people, the combined gate resolved the `basic` or `enriched` choice explicitly before creation, and an `enriched` choice used the direct `list build apollo people enriched` command.

@@ -147,7 +147,7 @@ Keys are the workflow's input ids (see `shape` on `workflow saved list` or `sche
 
 An entry is **pending** for a connection when its current version has no recorded run for that connection — new entries, updated entries, and upserted entries all pend; a finished run un-pends that version.
 
-- A manual `trigger` admits pending entries oldest-first (dataset order, top of the table), at most 100 per call (`--limit 1..100` to admit fewer, e.g. a sample of the first rows). Loop until `startedCount` is 0 to drain a large Dataset.
+- A manual `trigger` admits pending entries oldest-first (dataset order, top of the table), at most 1,000 per call (`--limit 1..1000` to admit fewer, e.g. a sample of the first rows). Loop until `startedCount` is 0 to drain a large Dataset.
 - `--trigger-policy auto` starts runs as entries become pending. Switching a connection to auto does **not** catch up already-pending entries — trigger manually first, then flip.
 - Failed runs never retry automatically. `rerun-failed` re-runs failed current-version entries, reusing their ledger records (no retry history).
 - `runs` pages the ledger: each record binds one input entry version to one Workflow run, with status (`running`/`completed`/`failed`/`discarded`) and failure detail.
