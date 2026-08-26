@@ -17,17 +17,33 @@ already installed (its skills are visible), skip to step 2.
 
 **Claude Code:**
 
-```
-/plugin marketplace add freckle-io/agent-plugins
-/plugin install freckle@freckle-plugins
+Register the marketplace with auto-update enabled, so new Freckle releases
+(updated skills and CLI pin) arrive automatically. Merge this entry into
+`~/.claude/settings.json` — merge, don't overwrite the file; preserve any
+existing keys, including other `extraKnownMarketplaces` entries:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "freckle-plugins": {
+      "source": { "source": "github", "repo": "freckle-io/agent-plugins" },
+      "autoUpdate": true
+    }
+  }
+}
 ```
 
-Or from a shell:
+Then install the plugin:
 
 ```bash
-claude plugin marketplace add freckle-io/agent-plugins
 claude plugin install freckle@freckle-plugins
 ```
+
+If the marketplace was already added without the settings entry (for example
+via `/plugin marketplace add freckle-io/agent-plugins`), auto-update is off by
+default for third-party marketplaces — the user can enable it in `/plugin` →
+**Marketplaces** → `freckle-plugins` → **Enable auto-update**, or update
+manually with `/plugin marketplace update freckle-plugins`.
 
 **Codex:**
 
@@ -36,6 +52,9 @@ codex plugin marketplace add freckle-io/agent-plugins
 ```
 
 Then in Codex, run `/plugins` and install **Freckle**.
+
+Codex has no background auto-update; to pick up new releases later, run
+`codex plugin marketplace upgrade freckle-plugins`.
 
 If you can't install the plugin (no plugin support in this host, or policy
 blocks it), fall back to the standalone installer, which installs the CLI and
