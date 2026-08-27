@@ -42,8 +42,8 @@ Workbook, gates the run on a sample and a credit forecast, then runs the rest.
 ## Set up
 
 New here? Point your coding agent at **[`GETTING_STARTED.md`](./GETTING_STARTED.md)**
-and ask it to set Freckle up for you. It walks through installing the plugin,
-getting `freckle` on PATH, and signing in with `freckle auth`.
+and ask it to set Freckle up for you. It walks through installing the
+`freckle` CLI, getting it on PATH, and signing in with `freckle auth`.
 
 **If you're an agent reading this directly:** read
 [`GETTING_STARTED.md`](./GETTING_STARTED.md) and follow it.
@@ -57,9 +57,16 @@ curl -fsSL https://raw.githubusercontent.com/freckle-io/agent-plugins/main/GETTI
 
 ### Claude Code
 
+Install the CLI and agent skills directly with the standalone installer:
+
+```bash
+sh -c "$(curl -fsSL https://install.freckle.io)"
 ```
-/plugin marketplace add freckle-io/agent-plugins
-/plugin install freckle@freckle-plugins
+
+On native Windows 11 x64:
+
+```powershell
+irm https://install.freckle.io/install.ps1 | iex
 ```
 
 ### Codex
@@ -72,9 +79,10 @@ Then open Codex, run `/plugins`, and install **Freckle**.
 
 ### After installing
 
-Start a new session and ask your agent to *"set up Freckle"* — the plugin's
-`setup` skill puts the bundled `freckle` CLI on your PATH (downloading a
-checksum-verified binary on first use) and signs you in with `freckle auth`.
+Start a new session and ask your agent to *"set up Freckle"* — it confirms
+`freckle` is on your PATH and signs you in with `freckle auth`. On Codex, the
+plugin's `setup` skill handles this, putting the bundled `freckle` CLI on your
+PATH (downloading a checksum-verified binary on first use).
 
 ## What's inside
 
@@ -128,20 +136,6 @@ and the `version` field in both plugin manifests are published automatically by
 the Freckle CLI release pipeline on every CLI release — do not edit them by
 hand; changes there would be overwritten by the next release. The plugin
 version tracks the CLI as `<cli major.minor>.<release sequence>`.
-
-## Standalone CLI install
-
-Prefer the CLI without the plugin?
-
-```bash
-sh -c "$(curl -fsSL https://install.freckle.io)"
-```
-
-On native Windows 11 x64:
-
-```powershell
-irm https://install.freckle.io/install.ps1 | iex
-```
 
 ---
 

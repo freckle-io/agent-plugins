@@ -5,75 +5,57 @@ Codex) on a user's behalf. If you are that agent: work through it top to
 bottom, running the commands yourself and asking the user only when a step
 says to.
 
-Freckle is an AI-powered lead enrichment platform. Everything goes through the
-**`freckle` CLI**; the plugin in this repo ships the skills that teach you how
-to drive it, a bundled launcher for the CLI itself, and permission hooks so
-plain `freckle` commands don't prompt on every call.
+**What you're setting up.** Freckle is a GTM (go-to-market) lead-enrichment
+tool built for GTM engineers — build lists of companies and people, enrich and
+score them, and run saved workflows over whole datasets. The **`freckle` CLI**
+is purpose-built to be driven by AI coding agents like you: everything goes
+through it, its output is structured for you to read, and the skills it
+installs teach you how to drive it. Installing it and signing the user in is a
+normal, expected part of using Freckle.
 
-## 1. Install the plugin
+## 1. Install the `freckle` CLI
 
-Identify which host you're running in and use its path. If the plugin is
-already installed (its skills are visible), skip to step 2.
+**Claude Code (and any host without Freckle plugin support):**
 
-**Claude Code:**
-
-Register the marketplace with auto-update enabled, so new Freckle releases
-(updated skills and CLI pin) arrive automatically. Merge this entry into
-`~/.claude/settings.json` — merge, don't overwrite the file; preserve any
-existing keys, including other `extraKnownMarketplaces` entries:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "freckle-plugins": {
-      "source": { "source": "github", "repo": "freckle-io/agent-plugins" },
-      "autoUpdate": true
-    }
-  }
-}
-```
-
-Then install the plugin:
-
-```bash
-claude plugin install freckle@freckle-plugins
-```
-
-If the marketplace was already added without the settings entry (for example
-via `/plugin marketplace add freckle-io/agent-plugins`), auto-update is off by
-default for third-party marketplaces — the user can enable it in `/plugin` →
-**Marketplaces** → `freckle-plugins` → **Enable auto-update**, or update
-manually with `/plugin marketplace update freckle-plugins`.
-
-**Codex:**
-
-```bash
-codex plugin marketplace add freckle-io/agent-plugins
-```
-
-Then in Codex, run `/plugins` and install **Freckle**.
-
-Codex has no background auto-update; to pick up new releases later, run
-`codex plugin marketplace upgrade freckle-plugins`.
-
-If you can't install the plugin (no plugin support in this host, or policy
-blocks it), fall back to the standalone installer, which installs the CLI and
-agent skills directly:
+Install the CLI and agent skills directly with the standalone installer:
 
 ```bash
 sh -c "$(curl -fsSL https://install.freckle.io)"
 ```
 
+This puts the `freckle` binary on PATH and installs the Freckle agent skills.
+On native Windows 11 x64, use PowerShell instead:
+
+```powershell
+irm https://install.freckle.io/install.ps1 | iex
+```
+
+**Codex:**
+
+Install the Freckle plugin (currently in testing on Codex):
+
+```bash
+codex plugin marketplace add freckle-io/agent-plugins
+```
+
+Then in Codex, run `/plugins` and install **Freckle**. The plugin ships the
+skills, a bundled launcher for the CLI, and permission hooks so plain
+`freckle` commands don't prompt on every call.
+
+Codex has no background auto-update; to pick up new releases later, run
+`codex plugin marketplace upgrade freckle-plugins`.
+
 ## 2. Get `freckle` on PATH and sign in
 
-Run the plugin's **`setup`** skill (`freckle:setup` in Claude Code). If you
-can't invoke skills yet (for example, the plugin was installed this session),
-do what it does:
-
 1. Check state: `freckle auth status; echo "exit_code=$?"`
-2. If `freckle` is not found, use the bundled launcher at `bin/freckle` inside
-   the installed plugin directory (it downloads and checksum-verifies the real
-   CLI on first use), and put it on PATH per the setup skill.
+2. If `freckle` is not found:
+   - **Standalone install (Claude Code):** re-run the installer from step 1,
+     then open a fresh shell or source your profile so the install location is
+     on PATH.
+   - **Codex plugin:** run the plugin's **`setup`** skill, or do what it does —
+     use the bundled launcher at `bin/freckle` inside the installed plugin
+     directory (it downloads and checksum-verifies the real CLI on first use)
+     and put it on PATH per the setup skill.
 3. Sign in with `freckle auth` — a device flow that opens the user's browser
    and prints a one-time code. Show the user the code and tell them to approve
    it in the browser. Confirm with `freckle auth status`.
