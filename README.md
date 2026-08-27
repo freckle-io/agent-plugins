@@ -57,10 +57,18 @@ curl -fsSL https://raw.githubusercontent.com/freckle-io/agent-plugins/main/GETTI
 
 ### Claude Code
 
-Install the CLI and agent skills directly with the standalone installer:
+Download the standalone installer, review it, then run it:
 
 ```bash
-sh -c "$(curl -fsSL https://install.freckle.io)"
+curl -fsSL https://install.freckle.io -o install-freckle.sh
+```
+
+Skim `install-freckle.sh` to see what it does (it verifies checksums,
+installs the `freckle` binary to `~/.local/bin`, and installs the
+Freckle agent skills), then run it:
+
+```bash
+sh install-freckle.sh
 ```
 
 On native Windows 11 x64:
