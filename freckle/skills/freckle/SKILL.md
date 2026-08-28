@@ -14,6 +14,7 @@ This is a router skill: pick exactly one route below and load only that referenc
 | User wants | Load |
 | --- | --- |
 | List building — build a new list of companies or people from a provider search, or run/inspect a List Workbook created by the `list` commands | [LIST.md](LIST.md) |
+| Import a CSV or plain rows into a Dataset, with no enrichment or workflow asked for | [BUILD.md#data-import-fast-lane](BUILD.md#data-import-fast-lane) |
 | Get Freckle to do something with no existing target — enrich, score, look up, run data, or build a Workbook or Workflow | [BUILD.md](BUILD.md) |
 | Do anything to an existing Workbook or Workflow identified by URL, id, or name — add data, run rows, or change its setup | [REFINE.md](REFINE.md) |
 | Run an existing saved Workflow directly with JSON inputs, inspect runs, list saved Workflows | [workflow/cli-reference.md](workflow/cli-reference.md) |
@@ -34,5 +35,6 @@ This is a router skill: pick exactly one route below and load only that referenc
 - Facts are agent work. Resolve anything available from the CLI, filesystem, inspected artifacts, catalogs, or other tools instead of asking the user. If a lookup can run independently, dispatch it and ask the rest of the frontier while it runs; only decisions downstream of that lookup wait.
 - Resolve the org from any named resource before asking the user. Confirm the active org only when the request supplies no resource from which to derive it. Auth-only, config-only, and generic product-capability answers need no org setup.
 - After automatic resolution, user selection, or an explicitly supplied org, pin `export FRECKLE_ORG_ID=<org-id>` in the reused shell for every routed org-scoped command, and preserve an explicitly supplied org. An explicit command `--org-id` takes precedence over `FRECKLE_ORG_ID`. Do not use `freckle org switch`; it writes shared global config that another agent can overwrite.
+- Preflight before the first command: `command -v freckle && freckle auth status`. Bash tool calls do not share shell state — an `export` only lives inside its own call, so re-export `FRECKLE_ORG_ID` (or prefix `FRECKLE_ORG_ID=<id>`) in every org-scoped command.
 - Confirm unfamiliar flags with `freckle <subcommand> --help` before running a command your route file prescribes.
 - Use absolute `--file` paths when possible; package scripts can change relative resolution.

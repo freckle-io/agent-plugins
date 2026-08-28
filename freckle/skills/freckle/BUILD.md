@@ -2,7 +2,25 @@
 
 Freckle work lands in a **Workbook**: an input Dataset holding the user's rows, a Workflow wired to it, and an output Dataset collecting the newest result for each row. The Workflow is the reusable engine; the Workbook is what the user actually gets. When a user asks Freckle to do something, the destination is a Workbook unless they explicitly scope the request to a Workflow artifact — and even then, the path below still applies; the workbook parts simply fall away.
 
-**This path is gated.** If the request asks Freckle to produce, change, or run anything, however small or clear it seems, your next action is to read [steps/step-1-context.md](steps/step-1-context.md) — the first command you run comes from that file. Several steps end in a question only the user can answer, so this path completes only in conversation with the user; finishing silently means the path was not followed.
+## Data-Import Fast Lane
+
+If the request is **purely ingesting data** — import a CSV or a set of rows into a Dataset, with no enrichment, scoring, workflow, or run asked for — take this lane instead of the six-step path below. Preflight first: `command -v freckle && freckle auth status` (Bash calls do not share shell state — re-export env vars in every command that needs them). If anything shape-changing is missing (destination workbook label, key column), ask for all of it in **one** batched round, with a recommended answer per question; ask nothing that the request or a lookup already answers.
+
+Exact sequence for a CSV into a **new** Workbook:
+
+```bash
+freckle org list                          # exactly one org → use it silently; else ask in the same batched round
+export FRECKLE_ORG_ID=<org-id>            # repeat this export in each subsequent Bash call
+freckle workbook create --label "<label>" --description "<one-liner>"
+freckle workbook dataset build new csv <workbook-id> /abs/path/rows.csv --label "<label>" --key-column <key>
+freckle workbook dataset entry list <workbook-id> <dataset-id> --limit 5   # verify rows landed
+```
+
+`build new csv` creates the Dataset and imports in one command, and deletes the Dataset again if the import fails. For an **existing** Dataset use `freckle workbook dataset csv import <workbook-id> <dataset-id> --file /abs/path/rows.csv --key-column <key>`. Always pass a `--key-column` that uniquely identifies a row (re-imports then update instead of duplicating). Report the workbook id, dataset id, and row count, and stop — no workflow work. The moment the request grows beyond ingestion (enrich, run, connect a workflow), leave this lane and enter the gated path below.
+
+## The Gated Build Path
+
+**This path is gated.** If the request asks Freckle to produce, change, or run anything beyond the fast lane above, however small or clear it seems, your next action is to read [steps/step-1-context.md](steps/step-1-context.md) — the first command you run comes from that file. Several steps end in a question only the user can answer, so this path completes only in conversation with the user; finishing silently means the path was not followed.
 
 Before anything else, write these six steps into your todo list, one item per step, using these exact labels — the user sees this list, so the labels stay jargon-free:
 
