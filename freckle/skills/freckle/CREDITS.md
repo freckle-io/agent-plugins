@@ -31,21 +31,21 @@ Choose the narrowest general report that answers the question:
 | Which enrichments consumed credits in this Workbook? | `credit workbook-node-usage --workbook-id …` | Billed nodes across the Workbook |
 | Which enrichments consumed credits for this Workflow? | `credit workflow-node-usage --workflow-id …` | Billed nodes across every context in which the Workflow ran |
 
-Resolve a named Workbook or Workflow and pin its org by the shared rules in [SKILL.md](SKILL.md#shared-operating-rules) before running a scoped report. A Workflow report within a Workbook requires the Workbook id; a Workflow node report follows that Workflow across standalone and Workbook runs.
+Resolve the org for a named Workbook or Workflow by the shared rules in [SKILL.md](SKILL.md#shared-operating-rules) before running a scoped report. A Workflow report within a Workbook requires the Workbook id; a Workflow node report follows that Workflow across standalone and Workbook runs.
 
 ## Dates and output
 
 `--from` and `--to` are inclusive UTC calendar dates in `YYYY-MM-DD` form. With neither flag, the range is the current UTC day. Supplying only one makes it the value of both, producing a one-day report.
 
-Usage responses return `creditsConsumed` and `enrichments` as exact decimal strings. Preserve those strings when presenting or calculating totals; use decimal arithmetic rather than binary floating-point conversion. `enrichments` counts billed node operations, not top-level Workflow Runs. One Workflow Run can therefore contribute several enrichments.
+Usage commands print `creditsConsumed` and `enrichments` as exact decimal strings. Preserve those strings when presenting or calculating totals; use decimal arithmetic rather than binary floating-point conversion. `enrichments` counts billed node operations, not top-level Workflow Runs. One Workflow Run can therefore contribute several enrichments.
 
 Node reports group charges by the billed `category` and `topic`. Workbook and Workflow summaries include their ids and nullable labels. In Workspace usage, `workbookId: null` is usage outside a Workbook; a non-null id with a null label can identify a deleted Workbook. Workbook Workflow summaries may include synthetic Signal identifiers as well as saved Workflow UUIDs.
 
 ## Sample credit evidence
 
-A recent bounded sample uses exact Workflow Run evidence. Keep the exact admitted Run IDs; after every selected run reaches a terminal state, inspect each one with `freckle workflow saved runs inspect <workflow-id> <run-id>`. For a Workbook connection, take its `workflowRunId` values from `workbook dataset connection runs`; for direct saved-Workflow invocations, keep each returned `runId`.
+A recent bounded sample uses exact Workflow Run evidence. Keep the exact admitted Run IDs; watch them with `freckle workflow saved runs watch <workflow-id> <run-id>...` until every selected run reaches a terminal state, then inspect each one with `freckle workflow saved runs inspect <workflow-id> <run-id>`. For a Workbook connection, keep the `workflowRunId` values printed by `workbook dataset connection run`; for direct saved-Workflow invocations, keep each returned `runId`.
 
-Sum the exact decimal-string `creditsConsumed` across every selected run, including failed or discarded terminal runs, and call that total **actual sample credits**. Complete per-run evidence is isolated by construction, so unrelated activity cannot distort it. Report that total immediately even when aggregate usage has not recorded the runs yet.
+Sum the exact decimal-string `creditsConsumed` across every selected run, including failed terminal runs, and call that total **actual sample credits**. Complete per-run evidence is isolated by construction, so unrelated activity cannot distort it. Report that total immediately even when aggregate usage has not recorded the runs yet.
 
 The aggregate `credit` reports remain the source for general usage information, historical or wider scopes, and node/category breakdowns. They are a sample fallback only when an exact sample Run ID or its `creditsConsumed` is unavailable. For that fallback, capture the narrowest report for the same UTC date before admission. After every sample run is terminal, capture that report again, then subtract the baseline `creditsConsumed` from the final value. In a `workflow-usage` response, compare the matching item in `workflows`, not the all-Workflow top-level total. Use:
 

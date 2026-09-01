@@ -10,8 +10,10 @@ For one input row:
 
 1. Add each at-most-once node's `creditCost` once, including every provider that could run across fallback branches.
 2. For each per-result node with a configured result cap, add `creditCost × cap`. Without a cap, keep `creditCost × billable results` as a formula and say a finite maximum is unavailable until the cap is known.
-3. Treat each usage-priced node as an unknown pre-run charge. Managed Apify converts the provider-reported Apify USD cost after execution into Freckle credits using `Apify usage USD ÷ (Workspace plan price USD ÷ plan credits)` — Workspaces without a current paid plan use the default plan rate ($99 for 1,000 credits) — so a finite maximum is unavailable before the Actor run reports its usage. BYOK Apify uses 0 Freckle credits, while Apify may charge the selected Integration Connection.
+3. Treat each usage-priced node as an unknown pre-run charge. Managed Apify converts the provider-reported Apify USD cost after execution into Freckle credits using `Apify usage USD ÷ (Workspace plan price USD ÷ plan credits)` — Workspaces without a current paid plan use the default plan rate ($99 for 1,000 credits) — so a finite maximum is unavailable before the Actor run reports its usage. Converted managed-provider usage rounds up to the next hundredth of a credit. BYOK Apify uses 0 Freckle credits, while Apify may charge the selected Integration Connection.
 4. When the Dataset size is fixed, multiply the complete per-row maximum by the row count. If any component remains uncapped or usage-priced, show its full-workbook formula instead of a finite total.
+
+After authoring, `workflow draft validate` prints a config-aware `costEstimate`; reconcile the plan against it.
 
 For a saved Workflow reused unchanged:
 
@@ -42,7 +44,7 @@ Report:
 - that averages and forecasts become eligible after the first 10 input rows’ runs reach terminal states and require trustworthy actual sample credits; and
 - that the exact admitted Workflow Run IDs will be kept for the sample evidence defined in [CREDITS.md](../CREDITS.md#sample-credit-evidence), naming an aggregate fallback scope only when exact Run evidence will be unavailable.
 
-Label every user-facing credit amount **credits**. Describe per-result and provider-usage formulas in plain language when needed, without exposing the catalog's billing-model labels. State that a finite maximum is an upper bound at current prices, not a range or a guaranteed charge; a row may use 0 credits. Authenticated dollar equivalents follow the rules below.
+Label every user-facing credit amount **credits**. Describe per-result and provider-usage formulas in plain language when needed, without exposing the catalog's billing-model labels. State that a finite maximum is an upper bound at current prices, not a range or a guaranteed charge; a row may use 0 credits. Dollar equivalents follow the rules below.
 
 ## After the sample: Credit Forecast Summary
 
@@ -62,8 +64,6 @@ When exact Run evidence is unavailable, apply the aggregate fallback in `CREDITS
 
 ## Dollar equivalents
 
-Add dollars only when an authenticated product response supplies the user's plan-specific credit-to-dollar rate. Then show dollars per row beside credits, and show a total-workbook dollar figure only for a fixed Dataset size. Name the plan/rate source and calculation.
+The CLI does not expose a dollar rate; report credits only. State that dollar equivalents are unavailable from the CLI; never infer a rate from plan names, public pricing, or generic assumptions.
 
-The current CLI does not expose the user's plan-specific rate. State that dollar equivalents are unavailable from the current CLI; never infer a rate from plan names, public pricing, or generic assumptions.
-
-**Completion:** the plan has one **Credit Cost Summary** based on a verified maximum, an explicit uncapped formula, or an explicit post-run provider-usage calculation; after the first 10 input rows’ runs reach terminal states, one **Credit Forecast Summary** reports the exact per-run sample-credit total, a trustworthy aggregate fallback, or the explicit attribution limitation; credit-cost quantities use the label “credits,” while authenticated plan-rate dollar equivalents remain allowed; no per-data-point credit allocation or unsupported range appears; and total dollars appear only for a fixed Dataset size.
+**Completion:** the plan has one **Credit Cost Summary** based on a verified maximum, an explicit uncapped formula, or an explicit post-run provider-usage calculation; after the first 10 input rows’ runs reach terminal states, one **Credit Forecast Summary** reports the exact per-run sample-credit total, a trustworthy aggregate fallback, or the explicit attribution limitation; credit-cost quantities use the label “credits”; and no per-data-point credit allocation, unsupported range, or dollar figure appears.

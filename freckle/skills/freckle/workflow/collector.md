@@ -39,7 +39,7 @@ A node accepts at most one incoming activation (`duplicate_activation_target` di
   ```
 
 - Inside the sandbox, code reads declared ports off the frozen `input` object — `input.<portId>`, singular, the only namespace available there. `$inputs.<inputId>` belongs to draft YAML alone and never appears inside `code`.
-- The scheduler waits for each bound source to reach a terminal outcome, then includes values from completed sources and omits inputs whose source is Not Selected. A source that always runs can bind to a required (non-`?`) input.
+- At runtime the collector waits for each bound source to reach a terminal outcome, then includes values from completed sources and omits inputs whose source is Not Selected. A source that always runs can bind to a required (non-`?`) input.
 - When the collector produces the final result shape, expose its output port (`value`) as the Workflow Output.
 
 ## Re-gating downstream
@@ -48,10 +48,12 @@ Converge at the **earliest shared value, in the shape the next shared consumer n
 
 A collector always runs, so it cannot activate the provider only on success by itself. Re-gate with one `switch` on the collector's own string output:
 
-1. Collector emits the identifier with a sentinel word for the miss case (`return input.a ?? input.b ?? 'missing'`, `outputType: string`) — the sentinel keeps the provider's required input type non-nullable.
-2. A `switch` node binds `value` to the collector's `value`, with `config: { cases: [missing], defaultCase: found }` — any real identifier falls to `found`, which activates the provider; the provider's required input binds to the collector's `value`.
+1. Collector emits the identifier with a sentinel for the miss case (`return input.a ?? input.b ?? '__NO_LINKEDIN_URL__'`, `outputType: string`) — the sentinel keeps the provider's required input type non-nullable. `switch` matches strings exactly, so pick a sentinel no real value can equal (`__NO_LINKEDIN_URL__` when real values are URLs).
+2. A `switch` node binds `value` to the collector's `value`, with `config: { cases: [__NO_LINKEDIN_URL__], defaultCase: found }` — any real identifier falls to `found`, which activates the provider; the provider's required input binds to the collector's `value`.
 
-The `switch` routes on the string directly — one node where a `code`-plus-`if` pair would spend two. Any JS that later consumes the identifier must treat the sentinel as absent (`input.url !== 'missing'`), not test emptiness.
+The `switch` routes on the string directly — one node where a `code`-plus-`if` pair would spend two. Any JS that later consumes the identifier must treat the sentinel as absent (`input.url !== '__NO_LINKEDIN_URL__'`), not test emptiness.
+
+Both `code` and `switch` are dynamic nodes: preview both after authoring with `freckle workflow node preview <nodeId> --file workflow.yaml`.
 
 Keep the collector **flat**: emit the bare identifier string. A metadata wrapper (`{ linkedInUrl, linkedInUrlSource }`) costs an extra node — endpoint references cannot reach into object fields, so the wrapper forces a second `code` whose only job is projecting the identifier back out for the `switch` and the provider. Metadata about which branch won belongs in the final formatter: bind the same branch outputs into it as optional inputs and recompute the source there (`input.aviatoUrl ? 'aviato' : input.freckleUrl ? 'freckle' : …`). Emit an object from the collector only when the next shared consumer consumes that whole shape.
 

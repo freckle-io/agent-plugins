@@ -2,7 +2,7 @@
 
 If the current request authors or changes a Workflow and you have not entered the six-step path in [../BUILD.md](../BUILD.md) or the refine path in [../REFINE.md](../REFINE.md), go back — these commands do not replace those paths; they tell you when to use them.
 
-Org-scoped Workflow commands accept `--org-id <org-id>` and `--token <frk_token>`. An explicit `--org-id` has highest precedence over `FRECKLE_ORG_ID` and shared global config. `workflow node list` and `workflow node inspect` use only the CLI Token because the catalog is global; `workflow node preview` remains org-scoped.
+Org-scoped Workflow commands accept `--org-id=<org-id>` and `--token <frk_token>`. Append `--org-id=<org-id>` after the complete subcommand path; an explicit value has highest precedence over `FRECKLE_ORG_ID` and shared global config. `workflow node list` and `workflow node inspect` use only the CLI Token because the catalog is global; `workflow node preview` remains org-scoped.
 
 ## Node Catalog
 
@@ -14,7 +14,7 @@ freckle workflow node inspect <definition-key>
 freckle workflow node inspect <definition-key> --contract
 ```
 
-Node command output is YAML. The following shapes are abbreviated; nested schemas, types, metadata, and repeated entries are omitted.
+The YAML shapes below are abbreviated; nested schemas, types, metadata, and repeated entries are omitted.
 
 `workflow node list` returns:
 
@@ -79,7 +79,7 @@ Preview dynamic nodes after their config is present in the draft:
 
 ```bash
 freckle workflow node preview <node-id> --file workflow.yaml
-freckle workflow node preview <node-id> --json '<draft-json>'
+freckle workflow node preview <node-id> --input-json '<draft-json>'
 ```
 
 `workflow node preview` returns the resolved contract for the requested node. Unlike inspect output, the resolved `contract` has no `kind` field:
@@ -102,10 +102,11 @@ List and inspect saved Workflows:
 
 ```bash
 freckle workflow saved list
-freckle workflow saved list --org-id <org-id>
+freckle workflow saved list --org-id=<org-id>
 freckle workflow saved list --all
+freckle workflow saved list --archived
 freckle workflow saved inspect <workflowId>
-freckle workflow saved inspect <workflowId> --org-id <org-id>
+freckle workflow saved inspect <workflowId> --org-id=<org-id>
 freckle workflow saved revisions list <workflowId>
 freckle workflow saved revisions inspect <workflowId> <revisionId>
 ```
@@ -170,12 +171,14 @@ freckle workflow saved unarchive <workflowId>
 Invoke a saved Workflow with a JSON object input:
 
 ```bash
-freckle workflow saved invoke <workflowId> --json '{"email":"person@example.com"}'
-freckle workflow saved invoke <workflowId> --json '{"email":"person@example.com"}' --external-invocation-id <id>
+freckle workflow saved invoke <workflowId> --input-json '{"email":"person@example.com"}'
+freckle workflow saved invoke <workflowId> --input-json '{"email":"person@example.com"}' --external-invocation-id <id>
 freckle workflow saved invoke <workflowId> --file inputs.json
 ```
 
-Capture the returned `runId`. Runs are async, so watch until terminal or inspect a single run on demand:
+Invoke prints a tagged response: check `type` first. `type: accepted` carries the `runId`; `type: rejected` carries `errors` and no `runId` — fix the printed errors before retrying. `invoke` and `workflow node preview` require exactly one of `--input-json` or `--file`.
+
+Runs are async, so watch until terminal or inspect a single run on demand:
 
 ```bash
 freckle workflow saved runs watch <workflowId> <runId...> --watch-timeout 10m
@@ -185,6 +188,8 @@ freckle workflow saved runs list <workflowId> --status completed --limit 25
 
 `--watch-timeout` accepts positive integer durations ending in `s` or `m`, for example `30s`, `5m`, or `10m`,
 up to `10m`. Watch up to 100 Workflow Run IDs per command.
+`watch` exits nonzero when any watched run fails; still read the printed statuses.
+`runs list` supports `--cursor` for pagination and `--workflow-revision-id` for filtering.
 Optional outputs from unselected branches may be omitted from run outputs.
 
 ## Run Errors
@@ -194,7 +199,7 @@ A failed run or node carries a product-safe error:
 ```yaml
 error:
   kind: <error-code>
-  category: <failure-category>
+  category: <optional-failure-category>
   message: <human-readable-explanation>
   details: <optional-safe-facts>
 ```
@@ -207,7 +212,7 @@ Choose how to react from `category` alone:
 - `provider_unavailable` — a transient upstream outage. Retry the run; no workflow change is needed. Any `kind` ending in `.runtime.provider_unavailable` means this.
 - `internal` — Freckle hit an internal error. The `kind` is always `freckle.node.internal`. Retry the run; if it persists, tell the user to contact Freckle support with the run id from `details`.
 
-Node-specific `kind` values and their fixes are documented per node in `workflow node inspect <definition-key>` under `authoring.commonDiagnostics`. Errors persisted before categories existed may omit `category`; treat those as unknown and read the `message`.
+Node-specific `kind` values and their fixes are documented per node in `workflow node inspect <definition-key>` under `authoring.commonDiagnostics`. `category` is optional; when it is absent, use `kind` and `message`.
 
 **Sample gate:** before running a saved Workflow across user rows, check the row count. Read [credit-cost.md](credit-cost.md) and return its Credit Forecast Summary after the first 10 input rows’ runs reach terminal states.
 

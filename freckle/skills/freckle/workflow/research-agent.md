@@ -4,9 +4,11 @@ Research Agent (`researchAgent` in the node catalog) does open-ended web researc
 
 Contract facts that shape the plan (inspect `researchAgent` for the full contract):
 
-- Its config declares a `prompt`, typed `inputs` (optional via the `?` type-shorthand suffix), and a `resultType`.
-- `resultType` must resolve to an object-shaped type with no optional fields and no `unknown` — declare uncertain values as `nullable<...>` fields. This constrains the result-fields table you plan in step 4.
-- It emits a fixed `result` output port typed by `resultType`; it selects no branch cases.
+- Its config requires `prompt`, `inputs`, and `resultType`; `webResearch` is optional, and only an explicit `false` disables web research.
+- Each `inputs` entry requires `portId`, `label`, and `type` (`description` is optional).
+- `resultType` must resolve to an exact object type: no optional fields, no `unknown`, no additional properties, no tagged unions. Declare values research may not find as `nullable<...>` fields. This constrains the result-fields table you plan in step 4.
+- It emits `result` (typed by `resultType`), `steps`, and an optional `sources` output port; it selects no branch cases.
+- A "not found" outcome lives inside a successful `result`; a runtime node failure fails the Workflow Run.
 
 **Decision rule:** inspect the node catalog first. If a structured provider's contract covers the objective, build a waterfall with Research Agent as the backstop. If no structured provider covers the data at all, Research Agent is primary — there is no waterfall to fall out of.
 

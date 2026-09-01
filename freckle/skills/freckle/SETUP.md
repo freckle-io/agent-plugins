@@ -9,12 +9,14 @@ Use this reference for auth, organization selection, and active endpoint inspect
 ```bash
 freckle auth
 freckle auth status
-freckle auth status --porcelain
+freckle auth status --json
 ```
 
-While the command waits, tell the user to approve the request in the opened browser tab — signing in or creating an account there first is part of the same flow, and if no browser opened, the printed URL gets them there. The command exits 0 once approved; confirm with `freckle auth status`. When device authorization is unavailable, the command reports why; in a shell without an interactive terminal it then exits with token instructions instead of prompting.
+While the command waits, tell the user to approve the request in the opened browser tab — signing in or creating an account there first is part of the same flow, and if no browser opened, give the user the printed URL and code; they can approve from any browser. The command exits 0 once approved; confirm with `freckle auth status`. When device authorization is unavailable, the command reports why; in a shell without an interactive terminal it then exits with token instructions instead of prompting.
 
-Use a token directly when device authorization is unavailable or no browser is available (headless or remote shells); the user creates one at `https://next.freckle.io/cli-auth`:
+`auth status` with no flags prints a human-readable summary. `auth status --json` prints `{ "status": "<token>" }` where the token is one of `authenticated`, `not-authenticated`, `invalid`, `network-unreachable`, or `verification-unavailable`. Read stdout; a zero exit does not mean authenticated.
+
+Run device auth first. Use a token only when device authorization is unavailable; the user creates one at `https://next.freckle.io/cli-auth`:
 
 ```bash
 freckle auth --token <frk_token>
@@ -29,15 +31,12 @@ List organizations:
 ```bash
 freckle org list
 freckle org list --token <frk_token>
+freckle org list --json
 ```
 
-If exactly one organization is available, use it without asking. Otherwise, ask the user to choose from the full list. After automatic resolution or user selection, pin the Active Organization in the reused shell:
+`org list` prints an `organizations` list of `orgId` and `name`.
 
-```bash
-export FRECKLE_ORG_ID=<org-id>
-```
-
-Do not use `freckle org switch`; it writes shared global config that another agent can overwrite. An explicit command `--org-id` still overrides this environment value.
+If exactly one organization is available, use it without asking. Otherwise, ask the user to choose from the full list. After automatic resolution or user selection, append `--org-id=<org-id>` after the complete subcommand path of every subsequent CLI command — for example, `freckle config path --org-id=<org-id>`.
 
 ## Config
 
@@ -48,3 +47,7 @@ freckle config path
 freckle config api-base-url
 freckle config app-host-url
 ```
+
+Each `config` read prints one bare value rather than a mapping, so `--json` prints that value as a JSON string.
+
+The `HTTP_API_ORIGIN` and `APP_HOST_URL` environment variables override the endpoints. `FRECKLE_CLI_PROFILE=<name>` isolates CLI config under `~/.config/freckle-<normalized-name>/config.json` (the name is lowercased and non-alphanumeric runs become `-`), which keeps concurrent agents from sharing state.

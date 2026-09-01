@@ -1,6 +1,6 @@
 # Workflow Draft YAML Syntax
 
-YAML is the authoring representation for one Workflow Draft: parse it into data, then validate and compile it through the API.
+YAML is the authoring representation for one Workflow Draft: parse it into data, then validate and compile it with `freckle workflow draft validate --file workflow.yaml`.
 
 ## Top-Level Shape
 
@@ -192,4 +192,4 @@ Validation performs:
 3. Node contract compilation, including config decoding, dynamic surfaces, and output-source checks.
 4. Compiled workflow assembly and cycle checks.
 
-Exit 0 with no output means valid. Nonzero exit means the draft is invalid; the output is a plain-text message followed by compiler diagnostics. Fix the reported issues and rerun.
+On success the command prints the compile response as YAML, including `ok`, `diagnostics`, `compiledWorkflow`, and `costEstimate`. Use the printed `costEstimate` as the pre-publication cost check. Nonzero exit means the draft is invalid; the output is a plain-text message followed by compiler diagnostics. Fix the reported issues and rerun.

@@ -6,7 +6,7 @@ Push to Dataset is a **handoff**: it persists an object array during a Workflow 
 
 ## Pick the destination
 
-- Every Push destination belongs to the current Workbook.
+- Every Push destination belongs to the current Workbook. Workbook-connected runs enforce this; standalone saved-Workflow invocations do not, so inspect the pinned destinations before invoking a Workflow standalone.
 - Use a Dataset the user explicitly names, even when it already has other sources.
 - Without an explicit target, reuse an existing Dataset only when an inspected Workflow already pins it as the shared handoff for the same design. A Dataset-wide `workflow_node` source does not identify its writers and is not enough evidence by itself. Otherwise create a dedicated Dataset.
 - Several Push to Dataset nodes — including several Apollo Find People paths — may share one destination.
@@ -33,15 +33,15 @@ with:
 
 `values` must be an array of JSON-compatible objects. Each object becomes one Dataset Entry unchanged. The `result` receipt contains `datasetId` and `pushedCount`; expose that receipt as the producing Workflow's normal output when the pushed values are its handoff.
 
-The target Dataset must already exist and be writable. Push does not create it or validate entries against its field catalog. Only cataloged fields render as columns and map into downstream Workflow inputs, so fill in the catalog for every field the handoff and its readers need. Seeding is a backstop, not a substitute: a push into an empty catalog seeds one field per top-level key of the pushed values, and Push never modifies a non-empty catalog.
+The target Dataset must already exist and be writable. Push does not create it or validate entries against its field catalog. Only cataloged fields render as columns and map into downstream Workflow inputs, so fill in the catalog for every field the handoff and its readers need. Seeding is a backstop, not a substitute: a push into an empty catalog seeds one field per leaf path of the pushed values — nested plain objects flatten into leaf-path fields up to a depth limit, while arrays, mixed-shape values, and empty objects stay single fields. Push never modifies a non-empty catalog.
 
 ## Write semantics
 
 - One execution accepts at most 1,000 objects and 5 MiB of compact serialized JSON.
-- The batch is atomic. An empty array succeeds with `pushedCount: 0` after validating the destination and writes no entries.
+- The batch is atomic. An empty array succeeds with `pushedCount: 0` after validating the destination; it writes no entries and seeds no catalog.
 - The Dataset creates or reuses one `workflow_node` Dataset Source. Each entry's source key is based on Workflow Run, node, and array index.
 - Replaying the same run/node/index reuses its entry. A separate Workflow Run uses different source keys and therefore creates distinct entries.
-- The receipt confirms committed entries, not completion of downstream Workflow Runs. Automatic downstream admission is best-effort after commit and recoverable by the normal pending-entry sweep.
+- The receipt confirms committed entries, not completion of downstream Workflow Runs. Automatic downstream admission is best-effort after commit and recoverable by Dataset recovery's operator-run sweep.
 
 ## Run gate
 

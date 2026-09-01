@@ -19,21 +19,26 @@ freckle connections show apify --json
 When a Workflow node config accepts a `credentialId`, inspect its node contract to identify the integration
 and whether the node supports managed access. Select an authorized credential from
 `freckle connections show <integration> --json` and set that exact ID while preserving the node's
-other config fields. If the selected credential is unavailable, ask the user to reconnect or select another;
+other config fields. Select only a credential whose `status` is exactly `authorized`; `connected` and
+`credentialCount` in list output do not imply usability. If the selected credential is unavailable, ask the user to reconnect or select another;
 use managed access only when the node contract supports it and the user chooses it. Use the Workflow cost
 estimate for Freckle credit cost; charges from a customer-owned provider account are separate.
 
 Apify Run Actor supports Freckle-managed access and BYOK. Omit `credentialId` for managed access; set the exact
-authorized Apify `credentialId` for BYOK. Apply the [Workflow credit-cost rules](workflow/credit-cost.md) for its
-paid-plan requirement, Freckle credit calculation, and customer-owned provider charges. Keep a selected BYOK
+authorized Apify `credentialId` for BYOK. Apply the [Workflow credit-cost rules](workflow/credit-cost.md) for the
+Freckle credit calculation and customer-owned provider charges. Keep a selected BYOK
 connection authorized until result collection completes; disabling, deleting, or rotating it during a run may
 prevent Freckle from collecting that run's results.
+
+ContactOut Find Phone Number also supports both: omit `credentialId` for managed access, or set an authorized
+ContactOut `credentialId` for BYOK. BYOK uses zero Freckle credits.
 
 Open the Freckle web app to connect one supported integration:
 
 ```bash
 freckle connections connect heyreach
 freckle connections connect hubspot
+freckle connections connect salesforce
 freckle connections connect instantly
 freckle connections connect slack
 freckle connections connect supabase
@@ -54,7 +59,7 @@ Users voice this intent in their own words — "use my own API key", "use tool X
 Resolve an `httpRequest` node's `credentialId` against its destination:
 
 1. Render the request's static scheme, hostname, and port from the node config.
-2. Run `freckle http-credentials list --json` and match that destination against each credential's public `allowedDomains` targets. An exact target matches only that host; `includeSubdomains: true` also matches hostname labels below it, never lookalike suffixes.
+2. Run `freckle http-credentials list --json` and match that destination against each credential's public `allowedDomains` policy. An `all_public_domains` policy matches any public HTTP(S) destination. A `restricted` policy matches when a target's scheme, port, and hostname match (an omitted port means 443 for HTTPS and 80 for HTTP); an exact target matches only that host, and `includeSubdomains: true` also matches hostname labels below it, never lookalike suffixes.
 3. Apply the match count: exactly one authorized match → select it automatically; multiple matches → ask the user to choose; none → tell the user a credential for that destination is needed and open the [setup form](#browser-only-secret-entry).
 
 Put only the saved `credentialId` from a fresh list result in the Workflow config.

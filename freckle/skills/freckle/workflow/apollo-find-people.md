@@ -4,7 +4,7 @@ Read this reference whenever `apolloFindPeopleBasic` or `apolloFindPeople` is pl
 
 ## Choose basic or enriched
 
-- **Basic — `apolloFindPeopleBasic`** calls only Apollo's people search API. It returns first name, obfuscated last name, title, availability flags, and basic organization data. Its catalog price is 0 credits and successful runs record no Freckle credit usage.
+- **Basic — `apolloFindPeopleBasic`** searches without enrichment. It returns first name, obfuscated last name, title, availability flags, and basic organization data. Its catalog price is 0 credits and successful runs record no Freckle credit usage.
 - **Enriched — `apolloFindPeople`** searches first, then bulk-enriches the people Apollo found. It can return full identity, contact, profile, employment, location, and organization fields. Its catalog price applies per successfully enriched person; missing enrichments are free.
 
 Use Basic when its fields satisfy the downstream work. Use Enriched only when the user needs fields that Apollo search does not reveal. There is no standalone Apollo Enrich Person node and no per-person enrichment follow-up to plan.
@@ -49,8 +49,8 @@ The exact supported `request` keys are:
 - `person_locations` — optional included locations.
 - `person_not_titles` — optional excluded titles.
 - `person_not_locations` — optional excluded locations.
-- `person_seniorities` — optional included Apollo seniority values.
-- `person_days_in_current_title_range` — optional current-title tenure range in days. Set `max` to find people who started their current title within the last N days; set `min` to require at least N days. At least one bound is required, and `min` cannot exceed `max`.
+- `person_seniorities` — optional included Apollo seniority values: `owner`, `founder`, `c_suite`, `partner`, `vp`, `head`, `director`, `manager`, `senior`, `intern`, `entry`.
+- `person_days_in_current_title_range` — optional current-title tenure range in days. Bounds are integers >= 0. Set `max` to find people who started their current title within the last N days; set `min` to require at least N days. At least one bound is required, and `min` cannot exceed `max`.
 - `include_similar_titles` — optional boolean, default `true`.
 
 Endpoint references bind whole values. When Workflow inputs do not already form the complete request object, construct it in a JavaScript transform node and bind that single value.

@@ -25,4 +25,4 @@ Company Search bills 1.8 credits per committed non-empty provider page of up to 
 
 ## Completed entries
 
-For a completed AI Ark company list, use `workbook dataset entry list <workbook-id> <dataset-id> --ai-ark-companies --limit 100`; this API-backed projection retains every available company field except the potentially large `technologies` array in both table and `--json` output, while the stored Dataset Entry remains complete. Follow `nextCursor` pages.
+For a completed AI Ark company list, use `freckle workbook dataset entry list <workbook-id> <dataset-id> --ai-ark-companies --limit 100`; this projection retains every available company field except the potentially large `technologies` array in both table and `--json` output, while the stored Dataset Entry remains complete. Follow `nextCursor` pages.

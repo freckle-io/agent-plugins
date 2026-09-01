@@ -1,14 +1,14 @@
 # Freckle Dataset Signals Reference
 
-Dataset Signals watch the Dataset Entries a workspace already keeps in one input Dataset and append provider findings to a separate output Dataset in the same Workbook. The input Dataset is the desired monitor set: adding a Dataset Entry requests a monitor, editing a Dataset Entry safely deactivates and replaces its remote monitor, and deleting a Dataset Entry requests remote cleanup. Deleting the Signal Provider Configuration requests cleanup for every monitor.
+Dataset Signals watch the Dataset Entries a workspace already keeps in one input Dataset and append provider findings to a separate output Dataset in the same Workbook. The input Dataset is the desired monitor set: adding a Dataset Entry starts monitoring it, editing a Dataset Entry replaces its monitor, and deleting a Dataset Entry stops its monitor. Deleting the Signal Provider Configuration stops every monitor.
 
-Provisioning and deletion are asynchronous. Commands report the configuration status plus aggregate monitor counts (`provisioning`, `active`, `failed`, `deleting`, and `deleted`); use `signals get` to follow progress. A successful create or delete command confirms that Freckle accepted the request, not that every remote monitor has already reached its terminal state.
+Provisioning, updates, and deletion are asynchronous. `signals get` prints the configuration status plus aggregate monitor counts (`total`, `provisioning`, `active`, `failed`, `deleting`, `paused`, and `deleted`); poll it until the expected terminal state. A successful create or delete command confirms that Freckle accepted the request, not that every monitor has reached its terminal state.
 
-Signals use Freckle-managed provider credentials and polling. Never ask for or pass a provider API key, webhook URL or secret, event key path, bulk id, or remote radar id.
+Signals use Freckle-managed provider access. Never ask for or pass a provider API key, webhook URL, or secret.
 
 ## Create
 
-Use the backend catalog to see Signal types and their per-finding credit costs:
+`signals list` prints the Signal types and their per-finding credit costs:
 
 ```bash
 freckle signals list
@@ -41,10 +41,10 @@ freckle signals create <input-dataset-id> <output-dataset-id> \
 
 `--department` and `--seniority` accept only these exact values; anything else fails at create time. A finding must match one value from each provided filter, so combining them narrows results.
 
-- Departments: `Accounting`, `Administrative`, `Business Development`, `Consulting`, `Customer Success`, `Design`, `Education`, `Engineering`, `Finance`, `Human Resources`, `Information Technology`, `Legal`, `Manufacturing`, `Marketing`, `Media and Communication`, `Operations`, `Product Management`, `Project Management`, `Purchasing`, `Quality Assurance`, `Real Estate`, `Research`, `Sales`, `Support`
+- Departments: `Accounting`, `Administrative`, `Business Development`, `Consulting`, `Customer Success`, `Design`, `Education`, `Engineering`, `Finance`, `Human Resources`, `Information Technology`, `Leadership`, `Legal`, `Manufacturing`, `Marketing`, `Media and Communication`, `Operations`, `Product Management`, `Project Management`, `Purchasing`, `Quality Assurance`, `Real Estate`, `Research`, `Sales`, `Support`
 - Seniorities: `Owner`, `CXO`, `Vice President`, `Director`, `Manager`, `Senior`, `Entry`, `Training`, `Partner`
 
-`--job-titles` overrides `--department` and `--seniority` when present, so pick one style of filtering per Signal. Repeat the flag to match any of several titles; each plain title is quoted automatically and the values combine with OR:
+The CLI sends every filter you supply, and each one narrows the match. Repeat the flag to match any of several titles; each plain title is quoted automatically and the values combine with OR:
 
 ```bash
 freckle signals create <input-dataset-id> <output-dataset-id> \
@@ -80,7 +80,7 @@ asynchronously.
 Contact job-change Signals do not support lookback. Do not ask the lookback question or pass
 `--include-last-24-hours` when `--signal-type contact_job_changes` is selected.
 
-Both Datasets must be active, distinct, and in the same Workbook. Creation prints the Signal Provider Configuration id and a `signals get` command. It is asynchronous and may take up to 3 hours; Freckle emails the user when the Signal launches and when its first event arrives.
+Both Datasets must be active, distinct, and in the same active Workbook. Creation prints the Signal Provider Configuration id and a `signals get` command. It is asynchronous and may take up to 3 hours; Freckle emails the user when the Signal launches and when its first event arrives. When the organization is out of credits, creation fails with a billing URL; show the user that URL instead of retrying.
 
 ## Inspect configured Signals
 
@@ -94,16 +94,14 @@ freckle signals configuration list --workbook-id <workbook-id>
 freckle signals configuration list --workbook-id <workbook-id> --json
 ```
 
-Exactly one scope flag is required. `--active` is organization-wide, excludes paused or deleting configurations, and
-omits monitor status to keep the response compact. The Dataset and Workbook forms include monitor status. The Workbook
-form aggregates configurations across its Datasets.
+Exactly one scope flag is required. `--active` is organization-wide, returns only configurations whose status is
+exactly `active`, and omits monitor status to keep the response compact. The Dataset and Workbook forms include monitor
+status. The Workbook form aggregates configurations across its Datasets.
 
 ```bash
 freckle signals get <signal-provider-configuration-id>
 freckle signals get <signal-provider-configuration-id> --json
 ```
-
-Output contains only product configuration and safe lifecycle data. It never contains managed credentials, remote radar ids, bulk correlation, leases, or raw provider errors.
 
 ## Turn monitoring off or on
 
@@ -122,14 +120,15 @@ freckle signals reactivate <signal-provider-configuration-id> --json
 ```
 
 Both operations are idempotent. A successful `off`/`pause` response reports `enabled: false`; a successful
-`on`/`reactivate` response reports `enabled: true`. Remote monitors transition asynchronously, so inspect progress after
-either operation:
+`on`/`reactivate` response reports `enabled: true`. Their output prints only the configuration; monitors transition
+asynchronously, so run `signals get` for monitor counts and progress:
 
 ```bash
 freckle signals get <signal-provider-configuration-id>
 ```
 
-Reactivation requires Signals to be enabled for the organization and enough available credits.
+Reactivation requires Signals to be enabled for the organization and enough available credits. Pause and reactivate do
+not repair a non-zero `failed` count, and the CLI has no retry command; direct the user to the web app.
 
 ## Delete
 
@@ -138,4 +137,4 @@ freckle signals delete <signal-provider-configuration-id>
 freckle signals delete <signal-provider-configuration-id> --json
 ```
 
-Delete is idempotent and asynchronous. Repeating it is safe. Historical findings remain in the output Dataset while remote monitors drain; late polled findings are ignored and do not create new Dataset Entries or Workflow admissions. Poll `signals get` until the configuration is `deleted`.
+Delete is idempotent and asynchronous. Repeating it is safe. Historical findings remain in the output Dataset. While deletion is in progress, new findings can still be stored, billed, and admitted to downstream connections. Poll `signals get` until the configuration is `deleted`.
