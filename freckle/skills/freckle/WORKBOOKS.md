@@ -1,10 +1,8 @@
 # Freckle Workbooks Reference
 
-Commands and semantics for Workbooks, Datasets, and Workflow Dataset Connections. If the current request builds or changes what a Workbook runs and you have not entered the gated path in [BUILD.md](BUILD.md) or the refine path in [REFINE.md](REFINE.md), go back — these commands do not replace those paths.
+Commands and semantics for Workbooks, Datasets, and Workflow Dataset Connections. If the current request builds or changes what a Workbook runs and you have not entered [BUILD.md](BUILD.md) or [REFINE.md](REFINE.md), go back — these commands do not replace those paths.
 
-A **Workbook** contains Datasets and connections. A **connection** reads entries from one input Dataset, maps them into a saved Workflow's inputs, runs them, and collects results into one output Dataset it creates in the same Workbook. The output Dataset holds only the newest result per input row — re-running a row replaces its outputs, never appends.
-
-Entry create/update and connection create take inline JSON input through `--input-json`, or a file through `--file`. Org-scoped commands accept `--org-id` and `--token` overrides; append `--org-id=<org-id>` after the complete subcommand path.
+A **Workbook** contains Datasets and connections. A **connection** reads entries from one input Dataset, maps them into a saved Workflow's inputs, runs them, and collects results into one output Dataset it creates in the same Workbook (newest result per input row; re-running a row replaces its outputs). Inline JSON input is `--input-json` or `--file`; append `--org-id=<org-id>` after the complete subcommand path.
 
 ## Workbooks
 
@@ -18,7 +16,7 @@ freckle workbook archive <workbook-id>
 freckle workbook unarchive <workbook-id>
 ```
 
-`workbook list` rows include each Workbook's Datasets (`id`, `label`, `fieldPaths`, `archivedAt`) and connections (`workflowId`, input/output dataset ids, `triggerPolicy`) — enough to see what every Workbook does without inspecting each one. `workbook inspect` returns the full graph: Datasets with complete field catalogs, and connections with input mappings and unfold config. Archived Datasets stay visible in both (connections may still reference them) with `archivedAt` set; they refuse ingestion and triggers.
+`workbook list` rows include each Workbook's Datasets (`id`, `label`, `fieldPaths`, `archivedAt`) and connections (`workflowId`, input/output dataset ids, `triggerPolicy`). `workbook inspect` returns the full graph with field catalogs and mappings. Archived Datasets stay visible with `archivedAt` set and refuse ingestion and triggers.
 
 ## Datasets
 
@@ -42,7 +40,34 @@ freckle workbook dataset csv import <workbook-id> <dataset-id> --file rows.csv -
 freckle workbook dataset build new csv <workbook-id> rows.csv --label "Imported Leads" --key-column email
 ```
 
-`build new csv` creates the Dataset and imports in one shot, deleting the Dataset again if the import fails. CSV imports accept at most 10 MiB and 100,000 data rows; the first row is the header, and no row may be wider than the header. `entry list` paginates with `--cursor`/`--limit` and offers mutually exclusive `--ai-ark-companies` / `--ai-ark-people` compact projections; entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
+`build new csv` creates the Dataset and imports in one shot (deleting it again if the import fails). CSV imports: at most 10 MiB and 100,000 rows, first row is the header. Entry deletion is asynchronous and cascades to derived downstream entries.
+
+### Reading every row
+
+`entry list` returns at most 1,000 rows per call and a `nextCursor` when more remain. Do not write a shell loop for this. Use this exact recipe, redirecting to a file rather than piping (the CLI can truncate piped `--json` output at 64 KiB):
+
+```bash
+cat > /tmp/drain.py <<'PY'
+import json, subprocess, sys
+wb, ds, org = sys.argv[1], sys.argv[2], sys.argv[3]
+rows, cursor = [], None
+while True:
+    cmd = ["freckle","workbook","dataset","entry","list", wb, ds, "--org-id="+org, "--json", "--limit", "1000"]
+    if cursor: cmd += ["--cursor", cursor]
+    out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
+    page = json.loads(out)
+    rows += page["entries"]
+    cursor = page.get("nextCursor")
+    if not cursor or not page["entries"]: break
+json.dump(rows, open("/tmp/rows.json","w"))
+print(len(rows))
+PY
+python3 /tmp/drain.py <workbook-id> <dataset-id> <org-id>
+```
+
+Then answer every question from `/tmp/rows.json`; never re-fetch to answer a second question.
+
+`--ai-ark-companies` / `--ai-ark-people` are mutually exclusive compact projections for large stored payloads.
 
 ## Sources and keys
 
@@ -55,54 +80,13 @@ freckle workbook dataset hubspot inspect <workbook-id> <source-id>
 freckle workbook dataset hubspot run-again <workbook-id> <source-id> --request-id <stable-request-id>
 ```
 
-Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
+Every entry enters through a source (`manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `signal`, provider searches, `workflow_output`, `workflow_node`) and carries a **source key** naming its logical record. CSV with `--key-column`: re-imports update matching rows (without it, keys are positional and re-imports duplicate). Webhook: key at `--key-path`. HubSpot/Salesforce: key is the remote record id, so later imports update rather than duplicate. Workflow-node entries: see [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
 
-- CSV with `--key-column`: key is that column's value; re-imports update matching rows. Rows with an empty key are skipped and reported. Without `--key-column`, keys are positional per import — a re-import creates duplicates, so prefer a key column.
-- Webhook: key is the value at `--key-path` (JSON Pointer) in each posted record; must be a non-empty scalar.
-- HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
-- Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset.
-- Manual entries: keyed by their own id; `entry update` replaces the value and bumps the version.
-- Workflow node entries: written by Push to Dataset through one reused `workflow_node` source per Dataset; their keys identify the producing Workflow Run, node, and array index. Repeating the same run/node/index reuses the entry; a separate run has distinct keys. See [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
+A webhook `endpointUrl` is a bearer credential: return it only to the authenticated requester, never create or rotate a source just to recover it. `webhook rotate` invalidates the old URL.
 
-Webhook source output may include an `endpointUrl`. Return an already-obtained endpoint only to the authenticated requester. Treat it as a bearer credential: anyone holding the URL can ingest data into the Dataset. Use an endpoint returned by the requester's authenticated command output when they need the existing URL. Never create or rotate a source merely to recover an existing endpoint. Systems using the endpoint POST one JSON object or an array of them (limits: 1000 records and 5 MB per request, 100 requests/min). `webhook rotate` invalidates the old URL.
+### HubSpot and Salesforce imports
 
-### Manual HubSpot imports
-
-`hubspot create` creates a new Dataset, configures its source, and starts the first import; it does not attach HubSpot to an existing Dataset. Get an authorized public credential ID with `connections show hubspot`, select `contacts`, `companies`, or `deals` with `--object-type`, and repeat `--property` in the order fields should be retained. `--description` is optional.
-
-Record selection is always explicit. Pass exactly one of:
-
-- `--list-id <stable-list-id>` to import members of one HubSpot list. List selection is independent and never combines with filter groups.
-- `--all-records` to import every record of the selected object type.
-- `--criteria-json '<json>'` for inline filter-group criteria.
-- `--criteria-file <path>` for filter-group criteria stored in a JSON file. Prefer this for non-trivial filters.
-
-For `--criteria-json` or `--criteria-file`, use the complete `HubspotDatasetImportCriteria` shape and preserve nested groups:
-
-```json
-{
-  "kind": "filter_groups",
-  "filterGroups": [
-    {
-      "filters": [
-        { "propertyName": "lifecyclestage", "operator": "EQ", "value": "customer" },
-        { "propertyName": "country", "operator": "IN", "values": ["India", "Singapore"] }
-      ]
-    },
-    { "filters": [{ "propertyName": "annualrevenue", "operator": "GTE", "value": "1000000" }] }
-  ]
-}
-```
-
-Filters within one group are ANDed; groups are ORed — pass the complete nested JSON as one value so that structure survives. Criteria allow 1–5 groups, 1–6 filters per group, and 18 filters total. Select 1–200 unique properties. Supported operators are `EQ`, `NEQ`, `GT`, `GTE`, `LT`, `LTE`, `CONTAINS_TOKEN`, `NOT_CONTAINS_TOKEN`, `IN`, `NOT_IN`, `BETWEEN`, `HAS_PROPERTY`, and `NOT_HAS_PROPERTY`. Single-value operators use `value`; `IN`/`NOT_IN` use a non-empty `values` array; `BETWEEN` uses `value` and `highValue`; property-existence operators take none of those fields.
-
-Always give create and run-again operations an operation-specific stable `--request-id`. Retrying create with the same request ID in the same Workbook returns the original source/run; retrying run-again with the same request ID for one source returns the original run. A genuinely new import gets a fresh ID.
-
-Create may include `--schedule '<cron>' --time-zone '<IANA-zone>'`; provide both or neither. The minimum cadence is 10 minutes. For an existing source, use `hubspot schedule set <workbook-id> <source-id> --schedule '<cron>' --time-zone '<IANA-zone>'`, or `hubspot schedule remove` to stop future scheduled imports. `hubspot run-again` remains a manual run and never changes the schedule.
-
-`hubspot inspect` returns the pinned config, nullable `schedule`, and `latestRun`. Read `latestRun.status` (`pending`, `running`, `completed`, or `failed`), `pagesProcessed`, and `error`; poll inspect when a terminal result is required. A schedule exposes its cron, time zone, disabled state, next run, lock time, and last scheduler error. In the immediate create/run-again response, read the top-level `run` as authoritative: the nested `source.latestRun` can still show the prior run until the next inspect. HubSpot list imports can be scheduled, and scheduled runs are incremental after the initial import.
-
-### Manual Salesforce imports
+`hubspot create` / `salesforce create` create a new Dataset with its source and (unless scheduled) start the first import; they do not attach to an existing Dataset. Get the credential id from `connections show <provider>`, repeat `--property` in retention order, and pass **exactly one** selection mode (HubSpot: `--list-id`, `--all-records`, `--criteria-json`/`--criteria-file`; Salesforce: `--list-id`, `--new-objects [--backfill]`, `--soql-file`). Give every create and run-again a stable `--request-id`; pass `--schedule` and `--time-zone` together or not at all. Read `latestRun.status` from `inspect` and poll to a terminal state. Custom SOQL must pass `salesforce soql preview` on the exact file before `create --soql-file`. Confirm exact flags with `--help`.
 
 ```bash
 freckle workbook dataset salesforce objects --credential-id <credential-id>
@@ -117,19 +101,15 @@ freckle workbook dataset salesforce schedule set <workbook-id> <source-id> --sch
 freckle workbook dataset salesforce schedule remove <workbook-id> <source-id>
 ```
 
-Like `hubspot create`, `salesforce create` creates a new Dataset and configures its source. Without a schedule it also starts the first import; with `--schedule` it only creates the scheduled source. Discover before creating: `objects` lists queryable objects, `fields` lists an object's field API names, and `list-views` lists its list views. Repeat `--property` with 1–200 field API names in the order fields should be retained. Pass exactly one of `--list-id <list-view-id>` (import one list view's members), `--new-objects` (import objects incrementally), or `--soql-file <path>` (import records matching custom SOQL); `--backfill` applies only with `--new-objects` and accepts exactly `24 hours`, `7 days`, `30 days`, `90 days`, `365 days`, or `1000 weeks`. Give each create or run-again a stable `--request-id`, and provide `--schedule` and `--time-zone` together.
-
-**Custom SOQL preview gate:** Write custom SOQL to an absolute file, then run `salesforce soql preview` against that exact file before `salesforce create --soql-file`. Preview compiles the query with Freckle's required record fields and importer-owned pagination, asks Salesforce for at most 10 rows, and exits nonzero when the query cannot be imported. Inspect the returned object, fields, effective SOQL, and rows; revise and preview again until the command exits 0 and the shape matches the goal. Zero rows is a valid preview: tell the user it matched nothing and adjust the filters when that misses the goal. Custom `SELECT` lists support 1–200 direct fields; the importer owns `ORDER BY`, `LIMIT`, and `OFFSET`, and rejects aggregate, grouped, relationship-select, alias, function, and subquery shapes.
-
 ## Field catalogs
 
-The **field catalog** names the Dataset fields Freckle can render as columns and map into workflow inputs — entries may hold extra fields, but only cataloged ones are mappable. Catalog format (`--file catalog.json`, either `{ "fieldCatalog": [...] }` or the bare array):
+The field catalog names the Dataset fields that render as columns and map into workflow inputs. Format (`--file catalog.json`):
 
 ```json
 [{ "id": "email", "path": "/email", "label": "Email", "type": "string", "visible": true, "order": 0 }]
 ```
 
-Types: `string`, `number`, `boolean`, `json`. An empty catalog is seeded automatically from the first field-bearing manual entry, webhook batch, CSV import, or Push to Dataset write; a connection's output Dataset is seeded from the workflow's output shape. Empty objects remain valid for constant-only Workflow rows and leave the catalog empty until a later field-bearing write. Once a catalog is non-empty, ingestion never extends or changes it; edits are explicit:
+Types: `string`, `number`, `boolean`, `json`. An empty catalog is seeded from the first field-bearing write; once non-empty, ingestion never changes it — edits are explicit:
 
 ```bash
 freckle workbook dataset catalog replace <workbook-id> <dataset-id> --file catalog.json
@@ -148,11 +128,9 @@ freckle workbook dataset connection runs <workbook-id> <connection-id> --limit 2
 freckle workbook dataset connection set-trigger-policy <workbook-id> <connection-id> --trigger-policy auto
 ```
 
-`connection create` requires an active (non-archived) Workflow with a published revision, creates the output Dataset in the same Workbook, and returns the connection with `outputDatasetId` — keep both ids. Add `--unfold-output-id <outputId>` to unfold (below).
+`connection create` requires an active Workflow with a published revision, creates the output Dataset, and returns `outputDatasetId` — keep both ids. Add `--unfold-output-id <outputId>` to make each element of one array-of-objects output its own row.
 
 ### Input mappings
-
-The mapping file assigns every workflow input a cataloged field or a constant:
 
 ```json
 {
@@ -161,7 +139,7 @@ The mapping file assigns every workflow input a cataloged field or a constant:
 }
 ```
 
-Keys are the workflow's input ids (see `shape` on `workflow saved list` or `schema` on `workflow saved inspect`); `fieldId` is a field catalog id on the input Dataset. Field types must be assignable to the input types. The mapping is checked at creation *and* re-checked against the workflow's current contract at every trigger — publishing a revision that breaks the mapping makes triggers reject with a diagnostic.
+Keys are the workflow's input ids (`shape` on `workflow saved list`); `fieldId` is a catalog id on the input Dataset. The mapping is re-checked against the workflow's current contract at every trigger.
 
 ### Pending and triggering
 
@@ -174,23 +152,9 @@ An entry is **pending** for a connection when its current version has no recorde
 
 ### Explicit entry runs
 
-`connection run` sends one ordered batch of 1–1,000 unique Dataset Entry ids. The entries must be current members of the connection's input Dataset; local argument errors make no request. The response preserves one result per requested id in the same order:
+`connection run` sends 1–1,000 entry ids and returns one result per id: `started`/`rerun` (accepted, with run ids), `skipped` (active run exists), `rejected` (`not_found` / `wrong_dataset`), or `failed` (stable admission failure with `reason`). A mixed response is a success — inspect every result. Results report **acceptance, not completion**; follow accepted runs with `connection runs` or `workflow saved runs watch`. Connections are live bindings: each run uses the latest published revision.
 
-- `started` or `rerun` means Workflow Run Acceptance succeeded and includes the Dataset Entry Run and Workflow Run ids.
-- `skipped` means an active run already exists; `rejected` means the entry was unavailable or belonged to another Dataset.
-- `failed` means admission reached a stable failure such as stale input, Workflow Run rejection, an unavailable connection, or an internal error. Read each stable `reason` and `diagnostic`.
-
-Missing entries and logically deleted entries both return `rejected/not_found`; entries found in another Dataset return `rejected/wrong_dataset`.
-
-A mixed response is successful: inspect every result instead of treating a zero exit status as proof that every entry was accepted. These results report **Workflow Run Acceptance, not execution completion**; use `connection runs` or Workflow Run inspection to follow accepted runs to terminal state.
-
-Connections are live bindings, not revision pins. Workflow Run Acceptance selects the latest Workflow Revision for each entry, so publishing a newer Workflow Revision changes later runs without recreating the connection.
-
-### Outputs and unfold
-
-Each successful run upserts output entries keyed to its input entry: re-running an input replaces its outputs in place (re-pending them for any downstream connection), results from a stale input version are discarded, and a failed run writes nothing. A downstream Workflow Dataset Connection with an auto trigger policy may admit those new or replaced outputs without another manual trigger. Output values are exactly the workflow output; lineage (`producedByRunId`, `producedFromEntryId`, `producedFromEntryVersion`) sits beside the value.
-
-**Unfold** elects one array-of-objects workflow output at creation (`--unfold-output-id`): each array element becomes its own output entry, sibling workflow outputs are not collected, and re-runs remove surplus elements the newer result no longer produces.
+Each successful run upserts output entries keyed to the input entry (lineage in `producedByRunId`, `producedFromEntryId`, `producedFromEntryVersion`); a failed run writes nothing.
 
 ## Limits and workarounds
 
