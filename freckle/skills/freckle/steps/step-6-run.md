@@ -34,10 +34,10 @@ A Workflow-artifact request with no Workbook runs rows per [cli-reference.md#run
 
 ## Hand off the created assets
 
-End a creation flow with a complete list of clickable links to every newly created Workbook and Workflow:
+End a creation flow with a complete list of clickable links to every newly created Workbook and Workflow. Each link's target is the `url` field the CLI returned on that object — it is org-scoped, so it opens in the right workspace. `workbook inspect <workbook-id>` and `workflow saved inspect <workflow-id>` return the `url` again whenever you no longer hold it.
 
-- Workbook: `[<label>](https://next.freckle.io/workbooks/<workbook-id>)`
-- Workflow: `[<label>](https://next.freckle.io/tools/<workflow-id>)`
+- Workbook: `[<label>](<url from the Workbook object>)`
+- Workflow: `[<label>](<url from the Workflow object>)`
 
 Keep Dataset ids for execution and verification; the created-assets handoff contains the Workbook and Workflow links only.
 
@@ -49,4 +49,4 @@ Keep Dataset ids for execution and verification; the created-assets handoff cont
 - [ ] Results were shown to the user as Markdown tables — every input at 20 or fewer rows; 10 representative inputs, labeled as a sample, when more.
 - [ ] The `credit-cost.md` Credit Forecast Summary was returned after 10 input rows’ runs reached terminal states.
 - [ ] Every connection's trigger policy matches the frozen plan.
-- [ ] The final handoff links every newly created Workbook and Workflow, with no Dataset ids in the created-assets list.
+- [ ] The final handoff links every newly created Workbook and Workflow with that object's returned `url`, with no Dataset ids in the created-assets list.

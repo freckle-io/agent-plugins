@@ -71,9 +71,9 @@ Poll while status is `queued` or `running`. Stop on `completed` or `failed`. Rep
 
 AI Ark reports `currentPage` and `nextPage` as zero-based provider page indexes. Apollo reports them as one-based page indexes. In both cases, print the returned values without conversion.
 
-For a completed list, page entries with `freckle workbook dataset entry list <workbook-id> <dataset-id> --limit 100` using the returned `datasetId`; when the output includes `nextCursor`, pass `--cursor "<nextCursor>"` for the next page and repeat until it is absent; the AI Ark guides name compact projection flags for their large stored payloads. The created asset handed to the user is the Workbook:
+For a completed list, page entries with `freckle workbook dataset entry list <workbook-id> <dataset-id> --limit 100` using the returned `datasetId`; when the output includes `nextCursor`, pass `--cursor "<nextCursor>"` for the next page and repeat until it is absent; the AI Ark guides name compact projection flags for their large stored payloads. The created asset handed to the user is the Workbook, linked with the org-scoped `url` field the CLI returned on it (`workbook inspect <workbook-id>` returns it again):
 
-`[<list name>](https://next.freckle.io/workbooks/<workbook-id>)`
+`[<list name>](<url from the Workbook object>)`
 
 ## From List to Workbook
 
