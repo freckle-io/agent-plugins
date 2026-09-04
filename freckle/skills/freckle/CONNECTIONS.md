@@ -7,18 +7,18 @@ Use this reference when the user wants to connect provider credentials, or wants
 List connectable integrations and inspect public credential summaries:
 
 ```bash
-freckle connections list
-freckle connections list --json
-freckle connections show hubspot
-freckle connections show heyreach
-freckle connections show hubspot --json
-freckle connections show contactout --json
-freckle connections show apify --json
+freckle connections list --org-id=<org-id>
+freckle connections list --json --org-id=<org-id>
+freckle connections show hubspot --org-id=<org-id>
+freckle connections show heyreach --org-id=<org-id>
+freckle connections show hubspot --json --org-id=<org-id>
+freckle connections show contactout --json --org-id=<org-id>
+freckle connections show apify --json --org-id=<org-id>
 ```
 
 When a Workflow node config accepts a `credentialId`, inspect its node contract to identify the integration
 and whether the node supports managed access. Select an authorized credential from
-`freckle connections show <integration> --json` and set that exact ID while preserving the node's
+`freckle connections show <integration> --json --org-id=<org-id>` and set that exact ID while preserving the node's
 other config fields. Select only a credential whose `status` is exactly `authorized`; `connected` and
 `credentialCount` in list output do not imply usability. If the selected credential is unavailable, ask the user to reconnect or select another;
 use managed access only when the node contract supports it and the user chooses it. Use the Workflow cost
@@ -36,14 +36,14 @@ ContactOut `credentialId` for BYOK. BYOK uses zero Freckle credits.
 Open the Freckle web app to connect one supported integration:
 
 ```bash
-freckle connections connect heyreach
-freckle connections connect hubspot
-freckle connections connect salesforce
-freckle connections connect instantly
-freckle connections connect slack
-freckle connections connect supabase
-freckle connections connect contactout
-freckle connections connect apify
+freckle connections connect heyreach --org-id=<org-id>
+freckle connections connect hubspot --org-id=<org-id>
+freckle connections connect salesforce --org-id=<org-id>
+freckle connections connect instantly --org-id=<org-id>
+freckle connections connect slack --org-id=<org-id>
+freckle connections connect supabase --org-id=<org-id>
+freckle connections connect contactout --org-id=<org-id>
+freckle connections connect apify --org-id=<org-id>
 ```
 
 The command prints the URL and tries to open a browser.

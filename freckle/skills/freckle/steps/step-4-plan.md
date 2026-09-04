@@ -2,8 +2,8 @@
 
 Present the plan and get explicit approval. Once accepted, the plan is **frozen**.
 
-- Open the plan message with the plain-English objective restatement from step 2 — this is where the user confirms it, together with the plan.
-- Draw the **Workbook picture** first: input Dataset (source kind and key column) → Workflow → output Dataset. Add every Push destination as a named side handoff and continue into any downstream Workflow connections the user described. Name the destination Workbook — existing label or the new label the user chose — and state each connection's trigger policy: run on demand, or automatically as new entries arrive.
+- Open the plan message with the [what-will-run summary](../SKILL.md#shared-operating-rules), then the plain-English objective restatement from step 2; the user confirms both together with the plan.
+- Draw the **Workbook picture** first: input Dataset (source kind and key column) → Workflow → output Dataset. Add every Push destination as a named side handoff and continue into any downstream Workflow connections the user described. Name the destination Workbook — the existing label, or the label you chose for a new one — and state each connection's trigger policy: run on demand, or automatically as new entries arrive.
 - Present the high-level workflow plan in plain English: why each provider is included, what triggers each fallback, and what the Research Agent should attempt. For a Workflow reused as-is, state that it runs unchanged and skip the diagram bullets below.
 - Render a concise diagram every time, at **provider level**: inputs, structured providers, the branch conditions between them (found / not found), the Research Agent, and every end state — including the all-fallbacks-failed path. Plumbing — collectors, switches, and JS transform/extract nodes — is implied by the branches and stays out of the diagram. The draft will contain more nodes than the diagram shows; that is expected, not a deviation.
 - Match the diagram format to the surface the user reads it on: a fenced ` ```mermaid ` flowchart (`flowchart TD`, branch conditions as edge labels) when your interface renders Mermaid code blocks as diagrams — chat apps and IDE panels that display rich Markdown; ASCII art when replies display as plain terminal text, or when you cannot tell — ASCII reads everywhere. Either format freezes the same shape.
@@ -23,6 +23,7 @@ After acceptance, the drawn shape is binding: the Workbook picture, diagram, map
 
 **Completion** — every box checked:
 
+- [ ] The plan message opens with the what-will-run summary in plain product language, ahead of every table and diagram.
 - [ ] The Workbook picture, diagram (in the format matched to the surface), mapping table, result-fields table, Credit Cost Summary, and any Dataset handoffs table are rendered in the plan message.
 - [ ] The user explicitly confirmed the full plan — destination org, Workbook destination, Push destinations, downstream readers, trigger policies, reuse choice, run intent, and the stated credit maximum or uncapped formula.
 - [ ] If the user changed anything, you returned to the earliest affected step and re-confirmed the revised plan before building.

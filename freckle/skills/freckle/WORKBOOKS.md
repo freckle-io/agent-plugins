@@ -68,7 +68,7 @@ Webhook source output may include an `endpointUrl`. Return an already-obtained e
 
 ### Manual HubSpot imports
 
-`hubspot create` creates a new Dataset, configures its source, and starts the first import; it does not attach HubSpot to an existing Dataset. Get an authorized public credential ID with `connections show hubspot`, select `contacts`, `companies`, or `deals` with `--object-type`, and repeat `--property` in the order fields should be retained. `--description` is optional.
+`hubspot create` creates a new Dataset, configures its source, and starts the first import; it does not attach HubSpot to an existing Dataset. Get an authorized public credential ID with `connections show hubspot --org-id <org-id>`, select `contacts`, `companies`, or `deals` with `--object-type`, and repeat `--property` in the order fields should be retained. `--description` is optional.
 
 Record selection is always explicit. Pass exactly one of:
 

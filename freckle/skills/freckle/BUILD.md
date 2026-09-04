@@ -4,7 +4,7 @@ Freckle work lands in a **Workbook**: an input Dataset holding the user's rows, 
 
 ## Data-Import Fast Lane
 
-If the request is **purely ingesting data into a new Workbook** — import a CSV or a set of rows, with no enrichment, scoring, workflow, or run asked for, and no existing Workbook or Dataset named as the destination — take this lane instead of the six-step path below. A pure import into an existing target is [REFINE.md](REFINE.md)'s work, not this lane's. Run the preflight and follow the shell-state rules from [SKILL.md#shared-operating-rules](SKILL.md#shared-operating-rules). If anything shape-changing is missing (destination workbook label, key column), ask for all of it in **one** batched round, with a recommended answer per question; ask nothing that the request or a lookup already answers.
+If the request is **purely ingesting data into a new Workbook** — import a CSV or a set of rows, with no enrichment, scoring, workflow, or run asked for, and no existing Workbook or Dataset named as the destination — take this lane instead of the six-step path below. A pure import into an existing target is [REFINE.md](REFINE.md)'s work, not this lane's. Run the preflight and follow the shell-state rules from [SKILL.md#shared-operating-rules](SKILL.md#shared-operating-rules). If anything shape-changing is missing (the key column, for instance), ask for all of it in **one** batched round, with a recommended answer per question; ask nothing that the request or a lookup already answers, and pick the Workbook and Dataset labels yourself.
 
 Exact sequence for a CSV into a **new** Workbook:
 

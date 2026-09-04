@@ -23,7 +23,7 @@ Prefer the highest classification any candidate reaches. Present the best reuse 
 Seed the tree with the branches below. Dependencies determine the frontier: for example, the data source unlocks its key and cadence questions, while the enrichment goal plus provider inspection unlock provider and fallback questions. Ask every independent branch on the current frontier in the same numbered round, with a recommended answer for each.
 
 - **The data.** What rows exist and where: a CSV in hand, records arriving from an outside system (webhook), a HubSpot or Salesforce import, or rows the user will paste in? For CSV rows, which field uniquely identifies a row (the key column — re-imports update rather than duplicate)? For HubSpot, resolve the authorized credential ID, object type (`contacts`, `companies`, or `deals`), properties to retain, and exactly one selection mode: a stable list ID, all records, or exact preserved filter groups. For Salesforce, resolve the authorized credential ID, discover the object and its fields, then choose exactly one selection mode: one list view, incremental new objects with an optional backfill window, or custom SOQL whose selected direct fields become Dataset fields. Roughly how many rows?
-- **The destination.** Add this data to an existing Workbook's Dataset, or start a new Workbook? New Workbooks need a label from the user.
+- **The destination.** Add this data to an existing Workbook's Dataset, or start a new Workbook? You name a new Workbook yourself ([names are agent work](../SKILL.md#shared-operating-rules)).
 - **The cadence.** Follows from the data source: a webhook feed runs continuously (automatic trigger policy); HubSpot and Salesforce imports run once or on a recurring schedule — ask which; everything else is a one-shot/manual batch (manual trigger policy).
 - **The workflow.** Enrichment goal, failure behavior, required output columns, and whether this is new or changing an existing Workflow.
 
@@ -41,4 +41,8 @@ A request the user explicitly scopes to a Workflow artifact — invoke with JSON
 - [ ] The unknowns list is empty: every user-intent shape-changing unknown was answered by the user or resolved by inspection.
 - [ ] You can restate in plain English: the objective, the data and its key, the destination Workbook decision, the cadence, the outputs, the reuse decision, the failure policy, and the run expectation.
 
-Completion met with a feed-and-run decision → read [step-6-run.md](step-6-run.md). Otherwise → read [step-3-contract-map.md](step-3-contract-map.md) **in the same turn** and continue straight through — the next thing the user sees is the step-4 plan, which opens with this restatement and is where they confirm it.
+Completion met with a feed-and-run decision → read [step-6-run.md](step-6-run.md).
+
+**Signal-only shortcut.** When the objective is a Dataset Signal with no Workflow (a HubSpot or other import + a Signal, no enrichment or transformation), steps 3–5 have nothing to do: there are no nodes to scout, no draft to author, and no Workflow to validate. Skip them entirely. The Signal's own [one-round-then-create](../SIGNALS.md#one-round-then-create) gate replaces the step-4 plan gate — its summary, questions, and the user's answers are the approval. After those answers, create the Workbook, import, output Dataset, and Signal in one pass, then hand off per [step-6-run.md](step-6-run.md). Do not present a separate plan or ask for a second confirmation.
+
+Otherwise → read [step-3-contract-map.md](step-3-contract-map.md) **in the same turn** and continue straight through — the next thing the user sees is the step-4 plan, which opens with this restatement and is where they confirm it.
