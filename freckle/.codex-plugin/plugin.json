@@ -3,15 +3,31 @@
   "version": "1.0.342",
   "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
   "author": {
-    "name": "Freckle"
+    "name": "Freckle",
+    "url": "https://freckle.io"
   },
+  "homepage": "https://freckle.io",
+  "repository": "https://github.com/freckle-io/agent-plugins",
   "license": "MIT",
+  "keywords": ["sales", "lead-enrichment", "prospecting", "workflows"],
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "Freckle",
-    "shortDescription": "AI-powered list building, enrichment, and lead scoring from your coding agent.",
+    "shortDescription": "Build prospect lists, enrich leads, and score companies with Freckle.",
+    "longDescription": "Use Freckle to build company and people lists, enrich lead data, score companies against your ideal customer profile, and run saved Workflows. Review a Workbook design, test a sample, and inspect the credit forecast before approving a full run. This package uses the Freckle CLI and requires a supported local environment, a Freckle account, and credits for paid operations.",
+    "developerName": "Freckle",
+    "category": "Productivity",
     "websiteURL": "https://freckle.io",
+    "privacyPolicyURL": "https://freckle.io/privacy-policy",
+    "termsOfServiceURL": "https://freckle.io/terms-of-service",
+    "logo": "./assets/freckle.png",
+    "composerIcon": "./assets/freckle.png",
+    "defaultPrompt": [
+      "Use Freckle to build a list of 50 fintech companies that match my ideal customer profile.",
+      "Use Freckle to enrich this company-domain CSV and show a sample and credit forecast before the full run.",
+      "Use Freckle to summarize my credit usage by Workbook."
+    ],
     "capabilities": [
       "Read",
       "Write"

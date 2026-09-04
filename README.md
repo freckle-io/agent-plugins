@@ -70,6 +70,14 @@ codex plugin marketplace add freckle-io/agent-plugins
 
 Then open Codex, run `/plugins`, and install **Freckle**.
 
+This installs from the GitHub marketplace. Public directory submission is tracked
+in [PUBLIC_SUBMISSION.md](./PUBLIC_SUBMISSION.md); a marketplace install does not
+publish a public listing.
+
+Codex asks you to review and trust plugin hooks before running them. Trust the
+Freckle hooks only after reviewing their behavior below. The CLI and skills work
+without hook trust; commands follow the normal approval flow.
+
 ### After installing
 
 Start a new session and ask your agent to *"set up Freckle"* — the plugin's

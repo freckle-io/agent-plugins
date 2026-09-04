@@ -53,6 +53,11 @@ codex plugin marketplace add freckle-io/agent-plugins
 
 Then in Codex, run `/plugins` and install **Freckle**.
 
+Start a new task to load the installed skills. Codex requires the user to review
+and trust the plugin's hooks before they can auto-approve commands. Let the user
+make that decision in Codex; do not edit trust settings on their behalf. Setup
+and normal Freckle work can proceed through ordinary approvals without hooks.
+
 Codex has no background auto-update; to pick up new releases later, run
 `codex plugin marketplace upgrade freckle-plugins`.
 
