@@ -12,7 +12,9 @@ freckle list build apollo companies \
   --limit 1000
 ```
 
-Available inline filters are `--company-name`, repeatable `--domain`, repeatable `--location`, repeatable `--excluded-location`, `--min-employees`, `--max-employees`, repeatable `--technology`, repeatable `--keyword`, `--min-revenue`, and `--max-revenue`. Always supply `--min-employees` and `--max-employees` together because Apollo accepts only bounded employee-count ranges; search-file `employeeCountRanges` likewise require both `min` and `max`. `--limit` accepts 1–50,000 companies. When omitted, Apollo imports all provider matches up to the 50,000-entry import cap.
+Available inline filters are `--company-name`, repeatable `--domain`, repeatable `--industry`, repeatable `--location`, repeatable `--excluded-location`, `--min-employees`, `--max-employees`, repeatable `--technology`, repeatable `--keyword`, `--min-revenue`, and `--max-revenue`. Always supply `--min-employees` and `--max-employees` together because Apollo accepts only bounded employee-count ranges; search-file `employeeCountRanges` likewise require both `min` and `max`. `--limit` accepts 1–50,000 companies. When omitted, Apollo imports all provider matches up to the 50,000-entry import cap.
+
+Use a snake_case industry name from `freckle list build apollo companies --help`, for example `--industry computer_software`. Repeat `--industry` to include multiple categories.
 
 ## Search file
 
@@ -20,6 +22,7 @@ For fields with no inline flag, write the complete Apollo `filters` object to an
 
 ```json
 {
+  "industries": ["computer_software"],
   "employeeCountRanges": [
     { "min": 1, "max": 50 },
     { "min": 5001, "max": 10000 }

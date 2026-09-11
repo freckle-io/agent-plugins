@@ -79,7 +79,7 @@ For a completed list, page entries with `freckle workbook dataset entry list <wo
 
 A completed List is a normal Workbook whose Dataset holds the imported rows, so everything Freckle can do with a Workbook now applies to it. Deliver the Workbook link with the final import status, and in the same message offer the follow-ups that fit the imported entity — the route ends when the user has chosen a next step or declined one, not at the link. In plain language, offer:
 
-- **People lists** — find verified work emails or mobile numbers, find LinkedIn profiles, validate emails, score the people, or send them to a connected tool such as HubSpot, Instantly, or HeyReach. For a new Apollo List that needs full last names, LinkedIn URLs, or emails at import time, choose the [Enriched List command](list/apollo-people.md#cost-line).
+- **People lists** — find verified work emails or mobile numbers, find LinkedIn profiles, validate emails, score the people, or send them to a connected tool such as HubSpot, Instantly, HeyReach, or Lemlist. For a new Apollo List that needs full last names, LinkedIn URLs, or emails at import time, choose the [Enriched List command](list/apollo-people.md#cost-line).
 - **Company lists** — find people at the imported companies, enrich or score the companies, send them to a connected tool, or monitor them for new hires with [Dataset Signals](SIGNALS.md).
 
 Present these as possibilities, not promises: which fields come back depends on the providers chosen in that follow-up.

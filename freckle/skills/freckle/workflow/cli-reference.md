@@ -38,36 +38,46 @@ Use the full `workflow node inspect <definition-key>` before authoring. It retur
 ```yaml
 definitionKey: <definition-key>
 definitionVersion: <definition-version>
-configSchema: <schema-representation>
+editor: <editor-metadata>
+purpose: <optional-purpose>
+creditCost: <credits>
+creditCostModel: <static-or-dynamic-or-usage_based>
+configSchema: <json-schema-or-null>
+configUnrepresentedRules: <rules-not-expressed-in-json-schema>
 contract:
   kind: static
   inputPorts: <input-port-details>
   outputs: <output-port-details>
   caseIds: <branch-case-ids>
-editor: <editor-metadata>
 authoring: <optional-authoring-guidance>
-creditCost: <credits>
-creditCostModel: <static-or-dynamic-or-usage_based>
 ```
 
-`authoring` is omitted when unavailable. A dynamic definition's full inspect has `contract: { kind: dynamic }`. Pricing fields use the same semantics as the list response.
+`purpose` and `authoring` are omitted when unavailable. A dynamic definition's inspect has `contract: { kind: dynamic }`. Pricing fields use the same semantics as the list response.
 
-`workflow node inspect <definition-key> --contract` prints only the contract. Static contracts have lowered ports and branch cases:
+Inspection and preview always include complete input, output, and config schemas. Use output schemas to choose downstream field mappings. `--json` changes only the format and also works with `--contract`.
+
+`workflow node inspect <definition-key> --contract` prints only the contract. Static contracts have port schemas and branch cases:
 
 ```yaml
 kind: static
 inputPorts:
   - portId: <port-id>
     label: <label>
-    type: <workflow-type>
+    schema: <json-schema>
+    unrepresentedRules: <rules-not-expressed-in-json-schema>
     isOptional: false
 outputs:
   - outputId: <output-id>
     label: <label>
-    type: <workflow-type>
+    schema: <json-schema>
+    unrepresentedRules: <rules-not-expressed-in-json-schema>
     isOptional: false
 caseIds: <branch-case-ids>
 ```
+
+Use each input port's `schema` to construct its value: it contains enums, limits, nested `required` fields, and documented defaults. Fields absent from `required` may be omitted, including defaulted fields. The CLI simplifies safe schema patterns for readability; resolve any remaining `$ref` values against the same document's `$defs`. `isOptional` controls whether the whole port can be unbound. Output schemas describe decoded values produced by the node. `configSchema` uses the same JSON Schema format, or is null when the node has no config.
+
+Read `unrepresentedRules` on ports and `configUnrepresentedRules` for config alongside the schemas. These list known custom checks, transformations, and opaque declarations that JSON Schema does not fully describe; runtime validation remains authoritative even when the lists are empty.
 
 A dynamic contract cannot be resolved without node config and may contain only:
 
