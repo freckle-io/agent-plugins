@@ -5,10 +5,14 @@ Research Agent (`researchAgent` in the node catalog) does open-ended web researc
 Contract facts that shape the plan (inspect `researchAgent` for the full contract):
 
 - Its config requires `prompt`, `inputs`, and `resultType`; `webResearch` is optional, and only an explicit `false` disables web research.
+- Omit `model` or use `{ "mode": "managed" }` for current managed execution and its credit price. The only accepted BYOK shape is `{ "mode": "byok", "provider": "openai", "modelId": "gpt-5.6-luna", "credentialId": 73 }`, where `credentialId` must be a positive integer identifying an existing OpenAI Integration Connection in the current workspace. Select the real connection ID; never invent one or embed an API key. Other providers and models are rejected.
+- BYOK calls OpenAI directly and uses zero Freckle credits, including web research. OpenAI bills the selected connection. Credential problems, rate limits, and provider failures never switch to managed execution; fix the selected connection or retry as appropriate. The runtime checks workspace ownership and authorization on each model call, including resumed runs; schema validation alone does not verify credentials or live model access.
 - Each `inputs` entry requires `portId`, `label`, and `type` (`description` is optional).
 - `resultType` must resolve to an exact object type: no optional fields, no `unknown`, no additional properties, no tagged unions. Declare values research may not find as `nullable<...>` fields. This constrains the result-fields table you plan in step 4.
 - It emits `result` (typed by `resultType`), `steps`, and an optional `sources` output port; it selects no branch cases.
 - A "not found" outcome lives inside a successful `result`; a runtime node failure fails the Workflow Run.
+
+When the user chooses OpenAI BYOK, follow [OpenAI connection setup and discovery](../CONNECTIONS.md#openai-for-research-agent) to select an authorized workspace credential before setting `model.credentialId`.
 
 **Decision rule:** inspect the node catalog first. If a structured provider's contract covers the objective, build a waterfall with Research Agent as the backstop. If no structured provider covers the data at all, Research Agent is primary — there is no waterfall to fall out of.
 

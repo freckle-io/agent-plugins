@@ -1,6 +1,6 @@
 # Freckle Integration Connections
 
-Use this reference when the user wants to connect provider credentials, or wants a Workflow to call an outside API with their own key — see [Custom HTTP APIs](#custom-http-apis) for how that intent sounds.
+Use this reference when the user wants to connect provider credentials or use their own API key in a Workflow. Match supported provider nodes to [Provider connections](#provider-connections), including [OpenAI for Research Agent](#openai-for-research-agent); use [Custom HTTP APIs](#custom-http-apis) for other APIs.
 
 ## Provider connections
 
@@ -15,6 +15,7 @@ freckle connections show lemlist --json --org-id=<org-id>
 freckle connections show hubspot --json --org-id=<org-id>
 freckle connections show contactout --json --org-id=<org-id>
 freckle connections show apify --json --org-id=<org-id>
+freckle connections show openai --json --org-id=<org-id>
 ```
 
 When a Workflow node config accepts a `credentialId`, inspect its node contract to identify the integration
@@ -46,15 +47,25 @@ freckle connections connect slack --org-id=<org-id>
 freckle connections connect supabase --org-id=<org-id>
 freckle connections connect contactout --org-id=<org-id>
 freckle connections connect apify --org-id=<org-id>
+freckle connections connect openai --org-id=<org-id>
 ```
 
 The command prints the URL and tries to open a browser.
 
 Both Apollo Find People nodes use Freckle-provided access and do not require a customer Apollo connection or `credentialId`; see [workflow/apollo-find-people.md](workflow/apollo-find-people.md).
 
+### OpenAI for Research Agent
+
+OpenAI is optional BYOK for Research Agent. To connect a key, run `freckle connections connect openai --org-id=<org-id>`; this opens that workspace's Settings → Integrations with OpenAI selected. The user enters, validates, and saves the key in the authenticated browser form. Keep the key out of chat, CLI arguments, URLs, logs, and Workflow JSON; direct the user to the form if they offer to paste it elsewhere.
+
+After saving, run `freckle connections show openai --json --org-id=<org-id>` again and select the exact authorized `credentialId`. This command returns public metadata only. When configuring BYOK, follow the [Research Agent model contract](workflow/research-agent.md) for the supported provider/model and credit behavior. A saved connection confirms authentication and permission to list models; it does not establish later model access, Responses permission, quota, or billing availability.
+
+- [ ] A fresh OpenAI connection summary in the requested workspace has `status: authorized`.
+- [ ] The selected credential ID comes from that summary; any Research Agent BYOK config follows its model contract.
+
 ## Custom HTTP APIs
 
-Users voice this intent in their own words — "use my own API key", "use tool X instead", "call our internal API", "hit the vendor's endpoint" — never in Freckle terms. Any request to reach an API with the user's own key means an `httpRequest` node plus a Workspace HTTP credential. HTTP credentials are separate from the provider Integration Connections above; connecting a provider never satisfies an `httpRequest` node, and an HTTP credential never satisfies a provider node.
+Users voice this intent in their own words — "use my own API key", "use tool X instead", "call our internal API", "hit the vendor's endpoint" — never in Freckle terms. Inspect the node catalog first: use a supported provider's BYOK connection when its contract covers the request, including OpenAI for Research Agent. For other APIs, use an `httpRequest` node plus a Workspace HTTP credential. HTTP credentials are separate from the provider Integration Connections above; connecting a provider never satisfies an `httpRequest` node, and an HTTP credential never satisfies a provider node.
 
 ### Matching a credential to the request
 
