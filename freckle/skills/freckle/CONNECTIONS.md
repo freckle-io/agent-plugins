@@ -32,7 +32,7 @@ Freckle credit calculation and customer-owned provider charges. Keep a selected 
 connection authorized until result collection completes; disabling, deleting, or rotating it during a run may
 prevent Freckle from collecting that run's results.
 
-ContactOut Find Phone Number also supports both: omit `credentialId` for managed access, or set an authorized
+ContactOut Find Phone Number and Find Personal Email also support both: omit `credentialId` for managed access, or set an authorized
 ContactOut `credentialId` for BYOK. BYOK uses zero Freckle credits.
 
 Open the Freckle web app to connect one supported integration:

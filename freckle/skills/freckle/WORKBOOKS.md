@@ -4,7 +4,7 @@ Commands and semantics for Workbooks, Datasets, and Workflow Dataset Connections
 
 A **Workbook** contains Datasets and connections. A **connection** reads entries from one input Dataset, maps them into a saved Workflow's inputs, runs them, and collects results into one output Dataset it creates in the same Workbook. The output Dataset holds only the newest result per input row — re-running a row replaces its outputs, never appends.
 
-Entry create/update and connection create take inline JSON input through `--input-json`, or a file through `--file`. Org-scoped commands accept `--org-id` and `--token` overrides; append `--org-id=<org-id>` after the complete subcommand path.
+Follow [shared operating rules](SKILL.md#shared-operating-rules) for organization overrides and JSON input/output flags. Command help documents file inputs.
 
 ## Workbooks
 
@@ -30,10 +30,11 @@ freckle workbook dataset archive <workbook-id> <dataset-id>
 freckle workbook dataset delete <workbook-id> <dataset-id>
 ```
 
-Entries and ingestion:
+Read `freckle workbook dataset entry list --help` for reading entries, pagination, and projections.
+
+Entry changes and ingestion:
 
 ```bash
-freckle workbook dataset entry list <workbook-id> <dataset-id> --limit 100
 freckle workbook dataset entry create <workbook-id> <dataset-id> --input-json '{"email":"person@example.com"}'
 freckle workbook dataset entry create <workbook-id> <dataset-id> --file entry.json
 freckle workbook dataset entry update <workbook-id> <dataset-id> <entry-id> --file entry.json
@@ -42,7 +43,7 @@ freckle workbook dataset csv import <workbook-id> <dataset-id> --file rows.csv -
 freckle workbook dataset build new csv <workbook-id> rows.csv --label "Imported Leads" --key-column email
 ```
 
-`build new csv` creates the Dataset and imports in one shot, deleting the Dataset again if the import fails. CSV imports accept at most 10 MiB and 100,000 data rows; the first row is the header, and no row may be wider than the header. `entry list` paginates with `--cursor`/`--limit` and offers mutually exclusive `--ai-ark-companies` / `--ai-ark-people` compact projections; entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
+`build new csv` creates the Dataset and imports in one shot, deleting the Dataset again if the import fails. CSV imports accept at most 10 MiB and 100,000 data rows; the first row is the header, and no row may be wider than the header. Entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
 
 ## Sources and keys
 

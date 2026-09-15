@@ -13,7 +13,7 @@ This is a router skill: pick one primary route below and load adjunct references
 
 | User wants | Load |
 | --- | --- |
-| List building — build a new list of companies or people from a provider search, or run/inspect a List Workbook created by the `list` commands | [LIST.md](LIST.md) |
+| List building — build a new list of companies or people from a provider search, or run/inspect a List Workbook created by the `list` commands | [LIST.md](LIST.md), then selected command help; provider references on demand |
 | Import a CSV or plain rows into a **new** Workbook, with no enrichment or workflow asked for and no existing target named | [BUILD.md#data-import-fast-lane](BUILD.md#data-import-fast-lane) — a pure import that names an existing Workbook or Dataset routes to [REFINE.md](REFINE.md) instead |
 | Get Freckle to do something with no existing target — enrich, score, look up, run data, or build a Workbook or Workflow | [BUILD.md](BUILD.md) |
 | Do anything to an existing Workbook or Workflow identified by URL, id, or name — add data, run rows, or change its setup | [REFINE.md](REFINE.md) |
@@ -37,7 +37,7 @@ This is a router skill: pick one primary route below and load adjunct references
 - Names are agent work too. Choose the label for every new Workbook, Dataset, and Workflow yourself — short, descriptive, in the user's own words for the goal — and show it wherever the user meets the artifact: the what-will-run summary, the plan, and the final link. Use a name the user supplies verbatim; otherwise the user renames in the app if they prefer something else.
 - Resolve the org from any named resource before asking the user. Confirm the active org only when the request supplies no resource from which to derive it. Auth-only, config-only, and generic product-capability answers need no org setup.
 - After automatic resolution, user selection, or an explicitly supplied organization, append `--org-id=<org-id>` after the complete subcommand path of every subsequent CLI command — for example, `freckle workbook list --org-id=<org-id>` — preserving any organization the user supplied. Do not use `freckle org switch`; it writes shared global config that another agent can overwrite.
-- Preflight before the first command: `command -v freckle && freckle auth status`.
-- `--json` always means output: every command that prints a payload renders YAML by default and pretty JSON with `--json`. Inline JSON *input* is always `--input-json`, never `--json`.
+- Preflight before the first command: `command -v freckle && freckle whoami`.
+- `--json` always means output: structured results render YAML by default and pretty JSON with `--json`. Commands that support tables require `--table`. Generic inline JSON payloads use `--input-json`; command help documents specialized JSON filters and file inputs.
 - Confirm unfamiliar flags with `freckle <subcommand> --help` before running a command your route file prescribes.
 - Use absolute `--file` paths when possible; package scripts can change relative resolution.

@@ -2,7 +2,7 @@
 
 Select the destination Active Organization for this work explicitly, even when shared global config already names one.
 
-- Check auth: `freckle auth status --json` prints `{ "status": "<token>" }`. `authenticated` → continue. `not-authenticated` or `invalid` → run the device flow in [../SETUP.md](../SETUP.md#auth), then re-check. `network-unreachable` or `verification-unavailable` → the token could not be verified; report that and retry later instead of re-authenticating.
+- Read `status` from `freckle whoami --json`: `authenticated` → continue; `not-authenticated`/`invalid` → [authenticate](../SETUP.md#auth) and re-check; `network-unreachable`/`verification-unavailable` → report and retry later without re-authenticating.
 - List every org the user can access: `freckle org list`.
 - Exactly one org: select it without asking, tell the user which org you're working in, carry it forward as described below, then move on.
 - Request names an existing Workflow or Workbook (by URL, id, or name): extract any id from the URL and derive the org from where that resource lives instead of asking.

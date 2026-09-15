@@ -4,23 +4,6 @@ Use this route when the user asks for a credit balance, spend, usage, or an enri
 
 ## Commands
 
-```bash
-freckle credit current
-freckle credit current --json
-
-freckle credit usage
-freckle credit usage --from 2026-08-01 --to 2026-08-06 --json
-
-freckle credit workflow-usage --workbook-id <workbook-id>
-freckle credit workflow-usage --workbook-id <workbook-id> --from 2026-08-01 --to 2026-08-06 --json
-
-freckle credit workbook-node-usage --workbook-id <workbook-id>
-freckle credit workbook-node-usage --workbook-id <workbook-id> --from 2026-08-01 --to 2026-08-06 --json
-
-freckle credit workflow-node-usage --workflow-id <workflow-id>
-freckle credit workflow-node-usage --workflow-id <workflow-id> --from 2026-08-01 --to 2026-08-06 --json
-```
-
 Choose the narrowest general report that answers the question:
 
 | Question | Command | Breakdown |
@@ -33,9 +16,15 @@ Choose the narrowest general report that answers the question:
 
 Resolve the org for a named Workbook or Workflow by the shared rules in [SKILL.md](SKILL.md#shared-operating-rules) before running a scoped report. A Workflow report within a Workbook requires the Workbook id; a Workflow node report follows that Workflow across standalone and Workbook runs.
 
+For syntax and flags, read the selected command's `--help`. For example:
+
+```bash
+freckle credit usage --from 2026-08-01 --to 2026-08-06 --json
+```
+
 ## Dates and output
 
-`--from` and `--to` are inclusive UTC calendar dates in `YYYY-MM-DD` form. With neither flag, the range is the current UTC day. Supplying only one makes it the value of both, producing a one-day report.
+Use command help for date syntax and defaults; include the returned date range when reporting usage.
 
 Usage commands print `creditsConsumed` and `enrichments` as exact decimal strings. Preserve those strings when presenting or calculating totals; use decimal arithmetic rather than binary floating-point conversion. `enrichments` counts billed node operations, not top-level Workflow Runs. One Workflow Run can therefore contribute several enrichments.
 

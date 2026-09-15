@@ -19,6 +19,6 @@ Use this template to describe Freckle and its current CLI capabilities.
 - Manage CLI setup: authenticate, list available organizations, work in the org the user chooses, and inspect active API/app endpoints.
 ```
 
-Apollo list pricing and the basic-versus-enriched people decision live in [the Apollo people guide](list/apollo-people.md); quote costs only from there.
+Apollo list cost guidance and the basic-versus-enriched people decision live in [List building](LIST.md#apollo-people-mode); quote the returned API cost estimates.
 
 End by asking whether the user wants to build a workbook for their data, build a company or people list, author a workflow, inspect existing workflows or workbooks, connect an integration, check credits, or run a saved workflow with sample inputs.

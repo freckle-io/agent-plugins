@@ -4,22 +4,22 @@ Use this reference for auth, organization selection, and active endpoint inspect
 
 ## Auth
 
-`freckle auth` is a device flow you run on the user's behalf whenever auth is missing or expired. It opens the approval page in the user's browser, prints a short one-time user code, and waits up to 15 minutes for approval. The credential lands directly in the CLI's local config; on this path nothing sensitive crosses the terminal or the conversation, and the user code itself is not a secret — show it to the user so they can match it in the browser.
+`freckle login` is a device flow you run on the user's behalf whenever auth is missing or expired. It opens the approval page in the user's browser, prints a short one-time user code, and waits up to 15 minutes for approval. The credential lands directly in the CLI's local config; on this path nothing sensitive crosses the terminal or the conversation, and the user code itself is not a secret — show it to the user so they can match it in the browser.
 
 ```bash
-freckle auth
-freckle auth status
-freckle auth status --json
+freckle login
+freckle whoami
+freckle whoami --json
 ```
 
-While the command waits, tell the user to approve the request in the opened browser tab — signing in or creating an account there first is part of the same flow, and if no browser opened, give the user the printed URL and code; they can approve from any browser. The command exits 0 once approved; confirm with `freckle auth status`. When device authorization is unavailable, the command reports why; in a shell without an interactive terminal it then exits with token instructions instead of prompting.
+While the command waits, tell the user to approve the request in the opened browser tab — signing in or creating an account there first is part of the same flow, and if no browser opened, give the user the printed URL and code; they can approve from any browser. The command exits 0 once approved; confirm with `freckle whoami`. When device authorization is unavailable, the command reports why; in a shell without an interactive terminal it then exits with token instructions instead of prompting.
 
-`auth status` with no flags prints a human-readable summary. `auth status --json` prints `{ "status": "<token>" }` where the token is one of `authenticated`, `not-authenticated`, `invalid`, `network-unreachable`, or `verification-unavailable`. Read stdout; a zero exit does not mean authenticated.
+`whoami` with no flags prints a human-readable summary. `whoami --json` includes `status`, one of `authenticated`, `not-authenticated`, `invalid`, `network-unreachable`, or `verification-unavailable`. When authenticated, it also includes `user_id`, `email`, and `name` when available; unavailable fields are omitted. Use the identity fields to identify the signed-in account. Read `status` from stdout; a zero exit does not mean authenticated.
 
 Run device auth first. Use a token only when device authorization is unavailable; the user creates one at `https://next.freckle.io/cli-auth`:
 
 ```bash
-freckle auth --token <frk_token>
+freckle login --token <frk_token>
 ```
 
 Auth also resolves from `FRECKLE_CLI_TOKEN`.
