@@ -90,6 +90,40 @@ Test procedure and results:
    this advance. Background download completion was not tested; the setting,
    UI, real SessionStart, and explicit update path were tested.
 
+## Follow-up: when the background check is scheduled
+
+The Slack discussion from August 25–26 conflated unsupported updates with
+updates being disabled by default. Third-party marketplace background updates
+are supported in the tested version; the old setup guide alone did not guarantee
+that every installation enabled them. PR #5 was still unmerged during this check,
+and the hook was absent from `origin/main`.
+
+A follow-up test left an interactive 2.1.270 session idle for over ten minutes
+with `autoUpdate: true` in both settings and the registry. No updater attempt
+appeared. Inspection of the installed executable explains why: `markSubmit()`
+calls background housekeeping on the **first prompt submission**; housekeeping
+starts the plugin updater, which selects eligible marketplaces and then waits a
+random delay of up to ten minutes. Merely opening an idle session does not start
+that timer in this version. The delay is not a promise to poll every ten minutes.
+
+Submitted a minimal prompt ("Reply OK only. Do not use tools.") to exercise this
+normal session path. The hook had already written the setting before this prompt;
+no model decision or tool use enables auto-update. Checked the remaining gates:
+
+- Freckle is enabled and its GitHub marketplace has `autoUpdate: true`.
+- `DISABLE_AUTOUPDATER`, `DISABLE_UPDATES`,
+  `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, and `CLAUDE_CODE_SIMPLE` are unset.
+- No remote managed restriction or user `disableAllHooks` is configured in the
+  isolated test. The hook ran successfully.
+- The marketplace uses the normal repository source, with no command/archive
+  helper or pinned ref that would exclude it from the ordinary updater.
+
+This verifies eligibility and the scheduling path; it does not establish a
+completed background download. Normal network or administrator restrictions can
+still prevent updates on a particular customer's machine. Updated plugin files
+load on reload or the next session, rather than replacing a running session's
+already-loaded skills immediately.
+
 ## Automated checks
 
 - `python3 -m unittest discover -s tests -v`: passed. Exercises Python and Node
