@@ -1,11 +1,14 @@
 <p align="center">
   <a href="https://freckle.io">
-    <img src="./assets/freckle.png" alt="Freckle" height="72">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./assets/freckle-dark.png">
+      <img src="./assets/freckle-light.png" alt="Freckle" height="72">
+    </picture>
   </a>
 </p>
 
 <p align="center">
-  <strong>Build with Freckle in your AI coding agent</strong> — skills and the <code>freckle</code>
+  <strong>Build GTM workflows with Freckle</strong> — skills and the <code>freckle</code>
   CLI, for Claude Code and Codex.
 </p>
 
@@ -13,9 +16,9 @@
   <a href="https://freckle.io">freckle.io</a> · <a href="./GETTING_STARTED.md">Getting started</a>
 </p>
 
-Freckle is an AI-powered lead enrichment platform — build lists of companies and
-people, enrich and score them, and run saved workflows over whole datasets, all
-from natural language. This repo is the plugin marketplace for `freckle`: one
+Use Freckle to build and run GTM workflows: find the companies and people you
+want, enrich them with the data you're missing, and send the results to the
+tools your team works in. This repo is the plugin marketplace for `freckle`: one
 plugin source, two coding-agent targets, sharing one set of skills and one CLI.
 
 ## Example

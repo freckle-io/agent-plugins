@@ -1,6 +1,6 @@
 {
   "name": "freckle",
-  "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
+  "description": "Use Freckle to build and run GTM workflows: find the companies and people you want, enrich them with the data you're missing, and send the results to the tools your team works in.",
   "version": "1.0.360",
   "author": {
     "name": "Freckle"

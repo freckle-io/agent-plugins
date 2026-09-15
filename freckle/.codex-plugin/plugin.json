@@ -1,17 +1,29 @@
 {
   "name": "freckle",
   "version": "1.0.360",
-  "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
+  "description": "Use Freckle to build and run GTM workflows: find the companies and people you want, enrich them with the data you're missing, and send the results to the tools your team works in.",
   "author": {
     "name": "Freckle"
   },
   "license": "MIT",
   "skills": "./skills/",
-  "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "Freckle",
-    "shortDescription": "AI-powered list building, enrichment, and lead scoring from your coding agent.",
+    "shortDescription": "Build GTM workflows",
+    "longDescription": "Use Freckle to build and run GTM workflows: find the companies and people you want, enrich them with the data you're missing, and send the results to the tools your team works in.",
+    "developerName": "Freckle",
+    "category": "Productivity",
     "websiteURL": "https://freckle.io",
+    "privacyPolicyURL": "https://freckle.io/privacy-policy",
+    "termsOfServiceURL": "https://freckle.io/terms-of-service",
+    "logo": "./assets/freckle-light.png",
+    "logoDark": "./assets/freckle-dark.png",
+    "composerIcon": "./assets/freckle-light.png",
+    "defaultPrompt": [
+      "Find 100 RevOps leaders at US SaaS companies and verify their emails.",
+      "Import companies from my HubSpot account that are missing a domain or key contact, then find the missing domains and decision-makers.",
+      "Find US fintech companies that raised funding in the last 90 days, find their Head of Sales and verify their email address."
+    ],
     "capabilities": [
       "Read",
       "Write"
