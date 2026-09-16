@@ -1,6 +1,6 @@
 # Freckle Integration Connections
 
-Use this reference when the user wants to connect provider credentials or use their own API key in a Workflow. Match supported provider nodes to [Provider connections](#provider-connections), including [OpenAI for Research Agent](#openai-for-research-agent); use [Custom HTTP APIs](#custom-http-apis) for other APIs.
+Use this reference when the user wants to connect provider credentials or use their own API key in a Workflow. Match supported provider nodes to [Provider connections](#provider-connections), including [OpenAI for Research Agent](#openai-for-research-agent) and [Anthropic for Research Agent](#anthropic-for-research-agent); use [Custom HTTP APIs](#custom-http-apis) for other APIs.
 
 ## Provider connections
 
@@ -48,6 +48,7 @@ freckle connections connect supabase --org-id=<org-id>
 freckle connections connect contactout --org-id=<org-id>
 freckle connections connect apify --org-id=<org-id>
 freckle connections connect openai --org-id=<org-id>
+freckle connections connect anthropic --org-id=<org-id>
 ```
 
 The command prints the URL and tries to open a browser.
@@ -61,6 +62,15 @@ OpenAI is optional BYOK for Research Agent. To connect a key, run `freckle conne
 After saving, run `freckle connections show openai --json --org-id=<org-id>` again and select the exact authorized `credentialId`. This command returns public metadata only. When configuring BYOK, follow the [Research Agent model contract](workflow/research-agent.md) for the supported provider/model and credit behavior. A saved connection confirms authentication and permission to list models; it does not establish later model access, Responses permission, quota, or billing availability.
 
 - [ ] A fresh OpenAI connection summary in the requested workspace has `status: authorized`.
+- [ ] The selected credential ID comes from that summary; any Research Agent BYOK config follows its model contract.
+
+## Anthropic for Research Agent
+
+Anthropic is BYOK-only for Research Agent. To connect a key, run `freckle connections connect anthropic --org-id=<org-id>`; this opens that workspace's Settings → Integrations with Anthropic selected. The user enters, validates, and saves the key in the authenticated browser form. Keep the key out of chat, CLI arguments, URLs, logs, and Workflow JSON; direct the user to the form if they offer to paste it elsewhere.
+
+After saving, run `freckle connections show anthropic --json --org-id=<org-id>` again and select the exact authorized `credentialId`. This command returns public metadata only. When configuring BYOK, follow the [Research Agent model contract](workflow/research-agent.md) for the supported provider/model and credit behavior. A saved connection confirms authentication and permission to list models; it does not establish later model access, Messages permission, quota, or billing availability.
+
+- [ ] A fresh Anthropic connection summary in the requested workspace has `status: authorized`.
 - [ ] The selected credential ID comes from that summary; any Research Agent BYOK config follows its model contract.
 
 ## Custom HTTP APIs
