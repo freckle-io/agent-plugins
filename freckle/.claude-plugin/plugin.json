@@ -9,6 +9,17 @@
   "repository": "https://github.com/freckle-io/agent-plugins",
   "license": "MIT",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/freckle\" config enable-claude-auto-update >&2 || true",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

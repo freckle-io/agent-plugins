@@ -24,10 +24,8 @@ In Claude Code, run:
 /plugin install freckle@freckle-plugins
 ```
 
-At session start, the plugin enables marketplace auto-update in your user
-settings, so future releases bring updated skills and CLI pins automatically.
-As a fallback, enable it in `/plugin` → **Marketplaces** → `freckle-plugins` →
-**Enable auto-update**.
+The plugin enables auto-update at session start. As a fallback, use `/plugin` →
+**Marketplaces** → `freckle-plugins` → **Enable auto-update**.
 
 Existing installs from before this hook shipped need a one-time update to
 receive it: run `/plugin marketplace update freckle-plugins`, then
