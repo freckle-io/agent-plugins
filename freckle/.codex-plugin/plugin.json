@@ -21,7 +21,7 @@
     "composerIcon": "./assets/freckle-light.png",
     "defaultPrompt": [
       "Find 100 RevOps leaders at US SaaS companies and verify their emails.",
-      "Import companies from my HubSpot account that are missing a domain or key contact, then find the missing domains and decision-makers.",
+      "Import HubSpot companies missing a domain or key contact, then find the missing domains and decision-makers.",
       "Find US fintech companies that raised funding in the last 90 days, find their Head of Sales and verify their email address."
     ],
     "capabilities": [
