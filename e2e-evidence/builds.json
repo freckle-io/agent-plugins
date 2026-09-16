@@ -1,0 +1,15 @@
+{
+  "commit": "16ac7d5fa03e5ed497f84166c79e4bc0a2bfd046",
+  "builds": [
+    {
+      "tag": "cli-no-runtime-e2e-1",
+      "sha256": "2a7313e40cf03f727c665baa250ad8654e0a45c1e39c8a4864bf17cb12da3f02",
+      "version": "freckle v1.0.0-e2e.1"
+    },
+    {
+      "tag": "cli-no-runtime-e2e-2",
+      "sha256": "b81d3d9ce66157da1051007c7e99e918320a0c127f0a20e61ef31d2e8ccd8842",
+      "version": "freckle v1.0.0-e2e.2"
+    }
+  ]
+}

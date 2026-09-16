@@ -1,0 +1,26 @@
+[
+  {
+    "session": "3119c086-3604-48c4-beea-e52dc29952b4",
+    "command": "command -v node python3 python bun jq freckle",
+    "result": "/tmp/freckle-no-runtime-e2e/home/.claude/plugins/cache/freckle-plugins/freckle/1.0.902-e2e.1/bin/freckle",
+    "is_error": false
+  },
+  {
+    "session": "3119c086-3604-48c4-beea-e52dc29952b4",
+    "command": "freckle --version",
+    "result": "freckle v1.0.0-e2e.1",
+    "is_error": false
+  },
+  {
+    "session": "d7fcb6a6-c4ff-4553-8214-32627ed2ee77",
+    "command": "command -v node python3 python bun jq freckle",
+    "result": "/tmp/freckle-no-runtime-e2e/home/.claude/plugins/cache/freckle-plugins/freckle/1.0.902-e2e.2/bin/freckle",
+    "is_error": false
+  },
+  {
+    "session": "d7fcb6a6-c4ff-4553-8214-32627ed2ee77",
+    "command": "freckle --version",
+    "result": "freckle v1.0.0-e2e.2",
+    "is_error": false
+  }
+]
