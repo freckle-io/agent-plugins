@@ -1,7 +1,7 @@
 {
   "name": "freckle",
   "description": "Build with Freckle in your coding agent \u2014 AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
-  "version": "1.0.900-github.1",
+  "version": "1.0.900-github.2",
   "author": {
     "name": "Freckle"
   },
