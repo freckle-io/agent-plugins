@@ -24,8 +24,12 @@ In Claude Code, run:
 /plugin install freckle@freckle-plugins
 ```
 
-The plugin enables auto-update at session start. As a fallback, use `/plugin` →
-**Marketplaces** → `freckle-plugins` → **Enable auto-update**.
+The plugin enables auto-update at session start and preserves an explicit
+opt-out. In Claude Desktop, it also enables plugin update checks despite the
+app's disabled CLI updater; restart Desktop if the change has not taken effect.
+This permits checks for all marketplaces already opted into auto-update and
+preserves any existing `FORCE_AUTOUPDATE_PLUGINS` setting. As a fallback, use
+`/plugin` → **Marketplaces** → `freckle-plugins` → **Enable auto-update**.
 
 Existing installs from before this hook shipped need a one-time update to
 receive it: run `/plugin marketplace update freckle-plugins`, then
@@ -51,6 +55,9 @@ sh -c "$(curl -fsSL https://install.freckle.io)"
 ```
 
 ## 2. Get `freckle` on PATH and sign in
+
+If an older standalone `freckle` shadows the plugin launcher, use the setup
+skill below to repair PATH; plugin updates do not replace that standalone CLI.
 
 Run the plugin's **`setup`** skill (`freckle:setup` in Claude Code). If you
 can't invoke skills yet (for example, the plugin was installed this session),
