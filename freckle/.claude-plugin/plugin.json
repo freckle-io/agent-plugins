@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/freckle\" config enable-claude-auto-update >&2 || true",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/freckle\" --freckle-internal-enable-claude-auto-update-v1 >&2 || true",
             "timeout": 120
           }
         ]
