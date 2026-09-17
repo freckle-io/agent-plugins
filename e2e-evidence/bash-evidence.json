@@ -1,0 +1,62 @@
+[
+  {
+    "timestamp": "2026-09-17T18:04:33.039Z",
+    "type": "Bash",
+    "id": "toolu_01HgxiRHfkvUHjf8mnNPvyfy",
+    "input": {
+      "command": "command -v node python3 python bun jq freckle",
+      "description": "Check which commands are available on PATH"
+    }
+  },
+  {
+    "timestamp": "2026-09-17T18:04:33.457Z",
+    "type": "Bash",
+    "id": "toolu_01UctkAZrTXQ9M9F7dZX8biR",
+    "input": {
+      "command": "freckle --version",
+      "description": "Print freckle CLI version"
+    }
+  },
+  {
+    "timestamp": "2026-09-17T18:04:33.533Z",
+    "type": "tool_result",
+    "id": "toolu_01HgxiRHfkvUHjf8mnNPvyfy",
+    "content": "/tmp/freckle-final-e2e/home/.claude/plugins/cache/freckle-plugins/freckle/1.0.903-e2e.1/bin/freckle"
+  },
+  {
+    "timestamp": "2026-09-17T18:04:34.063Z",
+    "type": "tool_result",
+    "id": "toolu_01UctkAZrTXQ9M9F7dZX8biR",
+    "content": "freckle v1.0.0-final-e2e.1"
+  },
+  {
+    "timestamp": "2026-09-17T18:11:33.297Z",
+    "type": "Bash",
+    "id": "toolu_01S7pAy36Yo6j8Vv2E6t3yAy",
+    "input": {
+      "command": "command -v node python3 python bun jq freckle",
+      "description": "Check which commands are available on PATH"
+    }
+  },
+  {
+    "timestamp": "2026-09-17T18:11:33.370Z",
+    "type": "Bash",
+    "id": "toolu_01Nh9rnYG8zmEjBRvq7Ym27P",
+    "input": {
+      "command": "freckle --version",
+      "description": "Print freckle CLI version"
+    }
+  },
+  {
+    "timestamp": "2026-09-17T18:11:33.695Z",
+    "type": "tool_result",
+    "id": "toolu_01S7pAy36Yo6j8Vv2E6t3yAy",
+    "content": "/tmp/freckle-final-e2e/home/.claude/plugins/cache/freckle-plugins/freckle/1.0.903-e2e.2/bin/freckle"
+  },
+  {
+    "timestamp": "2026-09-17T18:11:34.215Z",
+    "type": "tool_result",
+    "id": "toolu_01Nh9rnYG8zmEjBRvq7Ym27P",
+    "content": "freckle v1.0.0-final-e2e.2"
+  }
+]
