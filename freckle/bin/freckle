@@ -4,7 +4,7 @@
 # from the Freckle release server on first use and caching it.
 set -eu
 
-RELEASE_BASE_URL="https://releases.freckle.dev/cli"
+RELEASE_BASE_URL="http://127.0.0.1:18770"
 PLUGIN_REPO="freckle-io/agent-plugins"
 
 fail() {
