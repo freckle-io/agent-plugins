@@ -1,1 +1,1 @@
-895eb432518673b3e2ceca4bd6cfcf40b3550ac694bf5142b2a3b2e07f93fcf4  freckle-darwin-arm64
+4a09bba23fd586bccb76277b25edde85e2dc07e61109490e4a9ba752014b1adb  freckle-darwin-arm64
