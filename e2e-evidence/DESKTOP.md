@@ -39,7 +39,7 @@ Installed CLI pin: cli-desktop-auto-1
 5. The user observed B downloaded. Independently reading `~/.claude/plugins/installed_plugins.json` confirmed version `1.0.906-install.2`, commit `09af8e12c4867a7e9a05dc369b9e153ccd77e1cd`, and lastUpdated `2026-09-17T20:23:05.824Z`. Its CLI pin is `cli-desktop-auto-2`.
 
 **Confirmed:** installation in Desktop, automatic creation of both update settings, and automatic background download of B after a fresh Desktop session.
-**Still pending for this final fixture:** the user's post-download Desktop restart/probe showing CLI `1.0.0-desktop-auto.2`. Do not count the earlier manual-override activation test as this final fixture's activation result.
+**Final activation confirmed:** after quitting/reopening Desktop and starting a new Code session, the user supplied the actual probe output showing `CLAUDE_CODE_ENTRYPOINT=claude-desktop`, `FORCE_AUTOUPDATE_PLUGINS=1`, `freckle v1.0.0-desktop-auto.2`, installed plugin `1.0.906-install.2`, and pin `cli-desktop-auto-2`. This completes automatic setup → background download → updated CLI use in Desktop, with the separately repaired forwarder prerequisite described below. The probe read 19.6 minutes since publication at verification time; that is not the download duration (the registry recorded download earlier). Its generic restart message was stale guidance, not an additional required step.
 
 ## CLI resolution limitation
 
