@@ -1,7 +1,7 @@
 {
   "name": "freckle",
   "description": "Use Freckle to build and run GTM workflows: find the companies and people you want, enrich them with the data you're missing, and send the results to the tools your team works in.",
-  "version": "1.0.360+plugin.1",
+  "version": "1.0.369+plugin.1",
   "author": {
     "name": "Freckle"
   },
@@ -9,6 +9,17 @@
   "repository": "https://github.com/freckle-io/agent-plugins",
   "license": "MIT",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/freckle\" --freckle-internal-enable-claude-auto-update-v1 >&2 || true",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

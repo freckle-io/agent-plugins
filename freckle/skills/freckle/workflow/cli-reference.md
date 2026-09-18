@@ -85,7 +85,7 @@ A dynamic contract cannot be resolved without node config and may contain only:
 kind: dynamic
 ```
 
-Preview dynamic nodes after their config is present in the draft:
+Preview dynamic nodes after their config is present in the draft. Provide exactly one of `--input-json` or `--file`:
 
 ```bash
 freckle workflow node preview <node-id> --file workflow.yaml
@@ -178,28 +178,14 @@ freckle workflow saved unarchive <workflowId>
 
 ## Run Saved Workflows
 
-Invoke a saved Workflow with a JSON object input:
+Follow invoke → watch → inspect, reading each command's help before using it:
 
-```bash
-freckle workflow saved invoke <workflowId> --input-json '{"email":"person@example.com"}'
-freckle workflow saved invoke <workflowId> --input-json '{"email":"person@example.com"}' --external-invocation-id <id>
-freckle workflow saved invoke <workflowId> --file inputs.json
-```
+1. `freckle workflow saved invoke --help` — inputs, start responses, and retry behavior. Resolve any start rejection before continuing.
+2. `freckle workflow saved runs watch --help` — waiting, limits, and exit behavior.
+3. `freckle workflow saved runs inspect --help` — results and failure details.
 
-Invoke prints a tagged response: check `type` first. `type: accepted` carries the `runId`; `type: rejected` carries `errors` and no `runId` — fix the printed errors before retrying. `invoke` and `workflow node preview` require exactly one of `--input-json` or `--file`.
+Keep the exact accepted Run IDs through watching and inspection; report completion only after they reach terminal states and their results have been inspected. For run history and filtering, read `freckle workflow saved runs list --help`.
 
-Runs are async, so watch until terminal or inspect a single run on demand:
-
-```bash
-freckle workflow saved runs watch <workflowId> <runId...> --watch-timeout 10m
-freckle workflow saved runs inspect <workflowId> <runId>
-freckle workflow saved runs list <workflowId> --status completed --limit 25
-```
-
-`--watch-timeout` accepts positive integer durations ending in `s` or `m`, for example `30s`, `5m`, or `10m`,
-up to `10m`. Watch up to 100 Workflow Run IDs per command.
-`watch` exits nonzero when any watched run fails; still read the printed statuses.
-`runs list` supports `--cursor` for pagination and `--workflow-revision-id` for filtering.
 Optional outputs from unselected branches may be omitted from run outputs.
 
 ## Run Errors

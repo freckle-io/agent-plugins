@@ -32,18 +32,21 @@ freckle workbook dataset delete <workbook-id> <dataset-id>
 
 Read `freckle workbook dataset entry list --help` for reading entries, pagination, and projections.
 
-Entry changes and ingestion:
+Entry changes:
 
 ```bash
 freckle workbook dataset entry create <workbook-id> <dataset-id> --input-json '{"email":"person@example.com"}'
 freckle workbook dataset entry create <workbook-id> <dataset-id> --file entry.json
 freckle workbook dataset entry update <workbook-id> <dataset-id> <entry-id> --file entry.json
 freckle workbook dataset entry delete <workbook-id> <dataset-id> <entry-id...>
-freckle workbook dataset csv import <workbook-id> <dataset-id> --file rows.csv --key-column email
-freckle workbook dataset build new csv <workbook-id> rows.csv --label "Imported Leads" --key-column email
 ```
 
-`build new csv` creates the Dataset and imports in one shot, deleting the Dataset again if the import fails. CSV imports accept at most 10 MiB and 100,000 data rows; the first row is the header, and no row may be wider than the header. Entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
+Entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
+
+For CSV ingestion, choose the destination first and read the matching help for inputs, limits, key behavior, and failure handling:
+
+- Existing Dataset: `freckle workbook dataset csv import --help`.
+- New Dataset in an existing Workbook: `freckle workbook dataset build new csv --help`.
 
 ## Sources and keys
 
@@ -58,7 +61,7 @@ freckle workbook dataset hubspot run-again <workbook-id> <source-id> --request-i
 
 Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
 
-- CSV with `--key-column`: key is that column's value; re-imports update matching rows. Rows with an empty key are skipped and reported. Without `--key-column`, keys are positional per import — a re-import creates duplicates, so prefer a key column.
+- CSV: choose a stable `--key-column` when repeated imports should update the same logical records.
 - Webhook: key is the value at `--key-path` (JSON Pointer) in each posted record; must be a non-empty scalar.
 - HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
 - Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset.
