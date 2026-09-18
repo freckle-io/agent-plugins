@@ -147,26 +147,11 @@ costEstimate:
 
 Use the default saved Workflow list for reuse discovery — it is scoped to the Active Organization, which is the only organization reuse looks at; archived Workflows are not reuse candidates unless the user explicitly asks about archived Workflows. Use `--all` only when the user explicitly asks to list saved Workflows across every organization available to the CLI token, or when step 1 is locating a named Workflow to derive the destination organization; it returns groups keyed by organization and is not part of normal reuse discovery.
 
-Export an editable draft from a saved Workflow:
+Read the relevant command's help before exporting or saving:
 
-```bash
-freckle workflow saved get-draft <workflowId> --out workflow.yaml
-freckle workflow saved get-draft <workflowId> --revision-id <revisionId> --out workflow.yaml
-```
-
-Create a new saved Workflow and first revision:
-
-```bash
-freckle workflow saved create --file workflow.yaml --label "<label>" --description "<description>"
-```
-
-Keep the returned `workflow.id`; saved Workflow IDs are UUIDv7.
-
-Publish a new revision of an existing saved Workflow:
-
-```bash
-freckle workflow saved lifecycle publish <workflowId> --file workflow.yaml
-```
+- `freckle workflow saved get-draft --help` — export an editable draft; revision selection and file output.
+- `freckle workflow saved create --help` — create a new Workflow; required inputs and returned IDs.
+- `freckle workflow saved lifecycle publish --help` — add a revision to an existing Workflow; identity and publication effects.
 
 Update saved Workflow metadata or lifecycle state:
 

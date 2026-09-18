@@ -17,13 +17,7 @@ Reusing a saved Workflow as-is → nothing to draft; read [step-6-run.md](step-6
 
 Read [draft-syntax.md](../workflow/draft-syntax.md) before authoring.
 
-- Create a starter draft, then edit the YAML directly:
-
-  ```bash
-  freckle workflow draft init <workflow-slug> --file workflow.yaml
-  ```
-
-  For changes to an existing saved Workflow, or a clone-and-extend, start from the draft exported with `workflow saved get-draft` instead — see [cli-reference.md#saved-workflows](../workflow/cli-reference.md#saved-workflows). In a clone-and-extend, keep the preserved segment intact and edit only what the frozen plan changes.
+- For a new design, read `freckle workflow draft init --help`, create a starter, then edit the YAML. For an existing Workflow or clone-and-extend, export its draft using [cli-reference.md#saved-workflows](../workflow/cli-reference.md#saved-workflows). In a clone-and-extend, keep the preserved segment intact and edit only what the frozen plan changes.
 
 - Author the frozen diagram faithfully: every drawn provider, branch, Research Agent role, and end state appears in the draft, in the drawn order, and every branch routes on its drawn condition to its drawn target. Plumbing nodes (collectors, switches, JS transforms) are yours to add — the diagram deliberately omits them, but they must not invert or rewire a drawn branch. Before writing, compare the intended draft to the diagram; a missing, reordered, inverted, or rewired provider, branch, or end state is a plan change (step 4). If validation friction or node wiring makes the plan impractical, stop and ask the user to approve the smallest revised plan instead of simplifying silently.
 - Give every Code (`code`), Research Agent (`researchAgent`), and Apollo Find People (`apolloFindPeopleBasic` or `apolloFindPeople`) node you author both a `title` and a `description`. For every other node, both fields are optional. The title names this node instance's job in the Workflow; the description explains its authored intent. For each Code node, write its description in plain user language to summarize the specific transformation or decision and the resulting output. Never copy the generic Code Node Definition description, such as “Runs sandboxed JavaScript code to transform workflow data”. Preserve missing authored metadata on unchanged historical nodes; do not generate or backfill it. Put both fields directly on the node, not in `config`; limits and syntax are in [draft-syntax.md](../workflow/draft-syntax.md).
@@ -32,11 +26,7 @@ Read [draft-syntax.md](../workflow/draft-syntax.md) before authoring.
 - Re-read [apollo-find-people.md](../workflow/apollo-find-people.md) and [push-to-dataset.md](../workflow/push-to-dataset.md) when those nodes are present. Bind complete Apollo people objects directly for a handoff and expose the Push receipt as planned.
 - Check the authored `outputs` map against the frozen result-fields table; declare the typed object's top-level fields explicitly.
 - Preview dynamic nodes after their config exists in the draft (`workflow node preview <nodeId> --file workflow.yaml`), then update the draft if the preview changes the surface.
-- Validate, fix diagnostics, and rerun until it prints the compile response with `ok: true` and a `costEstimate`:
-
-  ```bash
-  freckle workflow draft validate --file workflow.yaml
-  ```
+- Read `freckle workflow draft validate --help`, then validate, fix diagnostics, and rerun until the compile response has `ok: true` and a `costEstimate`.
 
 **Completion** — every box checked (the draft boxes fall away when reusing a saved Workflow as-is):
 

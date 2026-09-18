@@ -10,7 +10,7 @@ Workbook commands and semantics for everything below are in [WORKBOOKS.md](../WO
 
 Skip when reusing a saved Workflow as-is or feeding an already-wired Workbook.
 
-- New Workflow: `workflow saved create --file workflow.yaml --label "<label>"`; keep the returned `workflow.id`. New revision of an existing Workflow: `workflow saved lifecycle publish <workflow-id> --file workflow.yaml`. Commands are in [cli-reference.md#saved-workflows](../workflow/cli-reference.md#saved-workflows).
+- Choose `workflow saved create` for a new Workflow or `workflow saved lifecycle publish` for a revision of the existing one. Read the corresponding help via [cli-reference.md#saved-workflows](../workflow/cli-reference.md#saved-workflows) before saving, and retain the returned Workflow and revision IDs.
 
 ## Connect the Workbook
 
