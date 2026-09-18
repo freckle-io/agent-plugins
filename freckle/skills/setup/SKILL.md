@@ -1,24 +1,26 @@
 ---
 name: setup
-description: Freckle setup — install and authenticate the `freckle` CLI, which is how the plugin talks to Freckle. Use when `freckle` is not found on PATH or the `freckle` found on PATH is the wrong version, `freckle auth status` fails, the CLI isn't signed in, or the user wants to configure Freckle. Signs the user in for new users.
+description: Freckle setup — install and authenticate the `freckle` CLI, which is how the plugin talks to Freckle. Use when `freckle` is not found on PATH or the `freckle` found on PATH is the wrong version, `freckle whoami` reports missing or invalid authentication, the CLI isn't signed in, or the user wants to configure Freckle. Signs the user in for new users.
 allowed-tools: Bash, Read, Edit, Write
 ---
 
 # Freckle setup
 
-Skills reach Freckle through the **`freckle` CLI**. **`freckle auth`** runs a device flow once
-and stores the credential on disk; the CLI re-reads it on every command, so `freckle auth status`
-succeeding is the whole proof.
+Skills reach Freckle through the **`freckle` CLI**. **`freckle login`** runs a device flow once
+and stores the credential on disk; the CLI re-reads it on every command. Check
+the `status` returned by `freckle whoami --json` to verify authentication.
 
 ## 1. Check current state
 
-Run this and read the printed **exit code and output**, not any status string:
+Run this and read the **`status` field from stdout**. A zero exit code does not
+mean the CLI is authenticated:
 
 ```bash
-freckle auth status; echo "exit_code=$?"
+freckle whoami --json
 ```
 
-- **exit_code=0** and the output shows a signed-in identity → the CLI is authenticated.
+- **`status: authenticated`** → the CLI is authenticated. Use the returned
+  identity fields (`email`, `name`, or `user_id`, when available) to identify the account.
   Also confirm it isn't an old install shadowing the bundled launcher, which an
   auth check alone can't tell you — compare the resolved version against the
   release this plugin pins in `bin/cli-version` (two levels up from this skill's
@@ -48,11 +50,11 @@ freckle auth status; echo "exit_code=$?"
     ```bash
     launcher="$(sh -c 'ls -1dt "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/*/freckle/*/bin/freckle 2>/dev/null | head -n1')"
     [ -x "$launcher" ] || { echo "could not locate the bundled freckle launcher; reinstall the plugin"; exit 1; }
-    "$launcher" auth status; echo "exit_code=$?"
+    "$launcher" whoami --json
     ```
 
     Use this same resolved path in place of bare `freckle` for every remaining command in
-    this skill (step 3's `freckle auth` included) — but re-run the `ls -1dt` one-liner
+    this skill (step 3's `freckle login` included) — but re-run the `ls -1dt` one-liner
     fresh immediately before each one rather than reusing `$launcher` across separate tool
     calls: each Bash call starts a new shell, so a variable set in one call is gone in
     the next. Bare `freckle` starts working again on its own once the agent is next
@@ -66,10 +68,12 @@ freckle auth status; echo "exit_code=$?"
   - **Codex**: go straight to step 2, then step 3 — Codex does not add a plugin's
     `bin/` to PATH automatically, so restarting alone won't fix this.
 
-- **Any other nonzero exit** with output saying the CLI isn't authenticated → the CLI
-  works but isn't signed in. Skip to step 3.
-- **Network errors** → check the network and any `HTTP_API_ORIGIN` override; do not
-  restart the sign-in flow.
+- **`status: not-authenticated` or `status: invalid`** → skip to step 3.
+- **`status: network-unreachable` or `status: verification-unavailable`** → report
+  the issue, check the network and any `HTTP_API_ORIGIN` override, and retry later
+  without restarting the sign-in flow.
+- **Other command failures or unexpected output** → diagnose the error before
+  proceeding; do not assume the user needs to sign in.
 
 ## 2. Put `freckle` on your PATH (if it was "command not found" or is an outdated version)
 
@@ -149,26 +153,27 @@ Re-run the step 1 check before continuing.
 
 ## 3. Sign in
 
-`freckle auth` is a device flow you run on the user's behalf. It opens the approval
+`freckle login` is a device flow you run on the user's behalf. It opens the approval
 page in the user's browser, prints a short one-time user code, and waits up to 15
 minutes for approval. The credential lands directly in the CLI's local config; nothing
 sensitive crosses the terminal or the conversation, and the user code itself is not a
 secret — show it to the user so they can match it in the browser.
 
 ```bash
-freckle auth
+freckle login
 ```
 
 While the command waits, tell the user to approve the request in the opened browser
-tab — signing in or creating an account there first is part of the same flow, and if
-no browser opened, the printed URL gets them there. The command exits 0 once approved;
-confirm with `freckle auth status`.
+tab — signing in or creating an account there first is part of the same flow.
+The command exits 0 once approved;
+confirm that `freckle whoami --json` returns `status: authenticated`.
 
-When device authorization is unavailable or there is no browser (headless or remote
-shells), the user creates a token at https://next.freckle.io/cli-auth and you run:
+If no browser opens, show the printed approval URL and code so the user can
+approve from another browser. Only when device authorization is unavailable,
+the user creates a token at https://next.freckle.io/cli-auth and you run:
 
 ```bash
-freckle auth --token <frk_token>
+freckle login --token <frk_token>
 ```
 
 Auth also resolves from `FRECKLE_CLI_TOKEN`.
