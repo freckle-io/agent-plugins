@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Build with Freckle in your AI coding agent</strong> — skills and the <code>freckle</code>
-  CLI, for Claude Code and Codex.
+  CLI, for Claude Code, Cowork, and Codex.
 </p>
 
 <p align="center">
@@ -61,6 +61,19 @@ curl -fsSL https://raw.githubusercontent.com/freckle-io/agent-plugins/main/GETTI
 /plugin marketplace add freckle-io/agent-plugins
 /plugin install freckle@freckle-plugins
 ```
+
+### Cowork (Claude Desktop)
+
+In Claude Desktop, open **Customize → Plugins → Add marketplace**, enter
+`freckle-io/agent-plugins` (or the full GitHub URL), then install **Freckle**
+from the `freckle-plugins` marketplace. The plugin's skills and the `freckle`
+CLI reference are available in your next Cowork session.
+
+> **Cowork note.** Cowork runs Claude inside a virtual machine and does not
+> run plugin permission hooks, so `freckle` CLI calls may prompt for approval
+> on each command there. The bundled launcher is built for Claude Code and
+> Codex; Cowork support is best-effort until Freckle ships a hosted MCP
+> connector.
 
 ### Codex
 
@@ -145,8 +158,21 @@ irm https://install.freckle.io/install.ps1 | iex
 
 ---
 
+## Support
+
+- Bugs and feature requests for the plugin: [GitHub issues](https://github.com/freckle-io/agent-plugins/issues)
+- Product and account help: [freckle.io](https://freckle.io)
+- Privacy policy: https://freckle.io/privacy-policy · Terms of service: https://freckle.io/terms-of-service
+
+## License
+
+MIT — see [`LICENSE`](./LICENSE).
+
+---
+
 <p align="center">
   <a href="https://freckle.io">Website</a> ·
   <a href="https://freckle.io/privacy-policy">Privacy policy</a> ·
-  <a href="https://freckle.io/terms-of-service">Terms of service</a>
+  <a href="https://freckle.io/terms-of-service">Terms of service</a> ·
+  <a href="https://github.com/freckle-io/agent-plugins/issues">Support</a>
 </p>

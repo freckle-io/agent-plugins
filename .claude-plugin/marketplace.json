@@ -1,16 +1,45 @@
 {
   "name": "freckle-plugins",
   "owner": {
-    "name": "Freckle"
+    "name": "Freckle",
+    "url": "https://freckle.io"
   },
   "metadata": {
-    "description": "Official Freckle plugins for coding agents"
+    "description": "Official Freckle plugins for coding agents",
+    "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "freckle",
+      "displayName": "Freckle",
       "source": "./freckle",
-      "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI."
+      "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
+      "author": {
+        "name": "Freckle",
+        "url": "https://freckle.io"
+      },
+      "homepage": "https://freckle.io",
+      "repository": "https://github.com/freckle-io/agent-plugins",
+      "license": "MIT",
+      "category": "productivity",
+      "tags": [
+        "sales",
+        "lead-enrichment",
+        "prospecting",
+        "data"
+      ],
+      "keywords": [
+        "freckle",
+        "lead-enrichment",
+        "lead-scoring",
+        "list-building",
+        "prospecting",
+        "sales",
+        "gtm",
+        "b2b-data",
+        "workflows",
+        "cli"
+      ]
     }
   ]
 }
