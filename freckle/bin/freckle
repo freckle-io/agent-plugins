@@ -118,4 +118,8 @@ fi
 # The cached binary is pinned by release tag; disable the CLI's self-updater so
 # the file the checksum vouched for never rewrites itself in place. Plugin
 # updates move the pin instead.
+# Scope API compatibility guidance to Claude; Codex keeps its existing behavior.
+if [ -n "${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
+  export FRECKLE_CLI_AGENT=claude-plugin
+fi
 FRECKLE_CLI_AUTO_UPDATE=0 exec "$cached" "$@"
