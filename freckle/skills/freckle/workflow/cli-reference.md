@@ -195,9 +195,11 @@ Choose how to react from `category` alone:
 
 Node-specific `kind` values and their fixes are documented per node in `workflow node inspect <definition-key>` under `authoring.commonDiagnostics`. `category` is optional; when it is absent, use `kind` and `message`.
 
-**Sample gate:** before running a saved Workflow across user rows, check the row count. Read [credit-cost.md](credit-cost.md) and return its Credit Forecast Summary after the first 10 input rows’ runs reach terminal states.
+### Sample gate
+
+Before running a Workflow across user rows, check the row count. Read [credit-cost.md](credit-cost.md) and return its Credit Forecast Summary after the first 10 input rows’ runs reach terminal states.
 
 - 20 or fewer rows: run all rows and inspect each run until terminal.
-- More than 20 rows: run the first 10 representative rows, inspect results until terminal, show those preview inputs and results plus the Credit Forecast Summary to the user, and ask whether to continue before running the rest.
+- More than 20 rows: run the first 10 rows in input order unless the user asks for a different sample. Inspect results until terminal, show those preview inputs and results plus the Credit Forecast Summary to the user, and ask whether to continue before running the rest.
 
 After processing rows, report final results as a Markdown table: every row when there are 20 or fewer; 10 representative rows, clearly labeled as a sample, when there are more.

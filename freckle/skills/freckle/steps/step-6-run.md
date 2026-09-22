@@ -22,7 +22,7 @@ The Workbook, input Dataset, and ingested data already exist from step 5. Feed-a
 ## Run through the sample gate
 
 - 20 or fewer input rows: `dataset connection trigger` and inspect every run to a terminal state.
-- More than 20 rows: pick ten representative entry IDs, run them with `dataset connection run <workbook-id> <connection-id> <entry-id...>` (the response reports acceptance, not completion), watch the accepted run IDs with `workflow saved runs watch <workflow-id> <run-id...>` until they reach terminal states, read the produced entries from the output Dataset, show the user a Markdown table of those sample inputs and results, add the **Credit Forecast Summary** required by `credit-cost.md`, and ask whether to continue before running the rest.
+- More than 20 rows: use the first ten entries in dataset list order unless the user asks for a different sample. Run them in that order with `dataset connection run <workbook-id> <connection-id> <entry-id...>` (the response reports acceptance, not completion), watch the accepted run IDs with `workflow saved runs watch <workflow-id> <run-id...>` until they reach terminal states, read the produced entries from the output Dataset, show the user a Markdown table of those sample inputs and results, add the **Credit Forecast Summary** required by `credit-cost.md`, and ask whether to continue before running the rest.
 - At 10 or more input rows, return the **Credit Forecast Summary** after 10 input rows’ runs reach terminal states. For 20 or fewer rows triggered together, report it when inspection finishes; for fewer than 10 rows, say the sample is too small for a forecast.
 - When Push is present, also inspect each Push receipt and the entries committed to every Push destination. Include a representative pushed-entry table in the sample report. A Push sample still means ten upstream input entries; Apollo's people-per-organization count remains the user-approved value.
 - Sample approved (or not needed): loop `dataset connection trigger` until `startedCount` is 0 — each call admits at most 1,000 pending entries.
@@ -46,7 +46,7 @@ Keep Dataset ids for execution and verification; the created-assets handoff cont
 - [ ] All created ids are captured: Workbook, Datasets, connections, Workflows, runs.
 - [ ] Every started run reached a terminal state.
 - [ ] Ordinary outputs and every Push destination were inspected.
-- [ ] Results were shown to the user as Markdown tables — every input at 20 or fewer rows; 10 representative inputs, labeled as a sample, when more.
+- [ ] Inputs and results were shown in a Markdown table — all rows at 20 or fewer; the ten sampled rows, labeled as a sample, when more.
 - [ ] The `credit-cost.md` Credit Forecast Summary was returned after 10 input rows’ runs reached terminal states.
 - [ ] Every connection's trigger policy matches the frozen plan.
 - [ ] The final handoff links every newly created Workbook and Workflow with that object's returned `url`, with no Dataset ids in the created-assets list.
