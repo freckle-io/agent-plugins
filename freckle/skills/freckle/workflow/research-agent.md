@@ -15,7 +15,9 @@ Contract facts that shape the plan (inspect `researchAgent` for the full contrac
 
 When the user chooses BYOK, follow [OpenAI setup](../CONNECTIONS.md#openai-for-research-agent) or [Anthropic setup](../CONNECTIONS.md#anthropic-for-research-agent) to select an authorized workspace credential before setting `model.credentialId`.
 
-**Decision rule:** inspect the node catalog first. If a structured provider's contract covers the objective, build a waterfall with Research Agent as the backstop. If no structured provider covers the data at all, Research Agent is primary — there is no waterfall to fall out of.
+**Use Jev instead when nothing needs looking up.** If the job is to classify rows into categories (such as tier 1, 2, or 3) or answer yes/no from data the row already has, use Jev › Decision agent (`decision` in the node catalog) and not Research Agent. Jev is free, it returns a tier string or a true/false that If and Switch nodes can read directly, and it fails loudly instead of guessing. It cannot browse the web, so when the answer depends on facts the row does not hold yet, use Research Agent or a provider to fetch them first, then let Jev decide on the result. Inspect `decision` for its config.
+
+**Decision rule:** inspect the node catalog first. If a structured provider's contract covers the objective, build a waterfall with Research Agent as the backstop. If the data still has to be looked up and no structured provider covers it, Research Agent is primary — there is no waterfall to fall out of.
 
 ## Backstop: final fallback in a waterfall
 
