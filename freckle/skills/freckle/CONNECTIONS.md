@@ -12,6 +12,7 @@ freckle connections list --json --org-id=<org-id>
 freckle connections show hubspot --org-id=<org-id>
 freckle connections show heyreach --org-id=<org-id>
 freckle connections show lemlist --json --org-id=<org-id>
+freckle connections show twain --json --org-id=<org-id>
 freckle connections show hubspot --json --org-id=<org-id>
 freckle connections show contactout --json --org-id=<org-id>
 freckle connections show apify --json --org-id=<org-id>
@@ -35,6 +36,11 @@ prevent Freckle from collecting that run's results.
 ContactOut Find Phone Number and Find Personal Email also support both: omit `credentialId` for managed access, or set an authorized
 ContactOut `credentialId` for BYOK. BYOK uses zero Freckle credits.
 
+Twain Generate Outreach requires an authorized Twain Integration Connection. Use its `credentialId` and the
+campaign ID copied from Twain's campaign “...” menu. The node returns messages and research in the Workflow;
+it uses zero Freckle credits, while Twain may charge the connected account. It does not add the contact to
+the Twain campaign.
+
 Open the Freckle web app to connect one supported integration:
 
 ```bash
@@ -43,6 +49,7 @@ freckle connections connect hubspot --org-id=<org-id>
 freckle connections connect salesforce --org-id=<org-id>
 freckle connections connect instantly --org-id=<org-id>
 freckle connections connect lemlist --org-id=<org-id>
+freckle connections connect twain --org-id=<org-id>
 freckle connections connect slack --org-id=<org-id>
 freckle connections connect supabase --org-id=<org-id>
 freckle connections connect contactout --org-id=<org-id>

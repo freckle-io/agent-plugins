@@ -171,6 +171,9 @@ Follow invoke → watch → inspect, reading each command's help before using it
 
 Keep the exact accepted Run IDs through watching and inspection; report completion only after they reach terminal states and their results have been inspected. For run history and filtering, read `freckle workflow saved runs list --help`.
 
+To stop a queued run, read `freckle workflow saved runs cancel --help` for eligibility, output, retry behavior, and discovery/cancellation/inspection examples.
+To stop all currently queued Runs for a Workflow, use `freckle workflow saved runs cancel all --help`.
+
 Optional outputs from unselected branches may be omitted from run outputs.
 
 ## Run Errors
