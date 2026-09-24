@@ -5,8 +5,8 @@ Research Agent (`researchAgent` in the node catalog) does open-ended web researc
 Contract facts that shape the plan (inspect `researchAgent` for the full contract):
 
 - Its config requires `prompt`, `inputs`, and `resultType`; `webResearch` is optional, and only an explicit `false` disables web research.
-- Omit `model` or set `{ "mode": "managed" }` for managed OpenAI GPT-5.6 Luna.
-- BYOK uses `mode: "byok"` with `provider`, `modelId`, and `credentialId` for an existing matching-provider workspace connection. Supported pairs: `openai` / `gpt-5.6-luna` or `anthropic` / `claude-sonnet-5` or `claude-opus-5`.
+- Omit `model` or set `{ "mode": "managed" }` for managed OpenAI GPT-6 Luna.
+- BYOK uses `mode: "byok"` with `provider`, `modelId`, and `credentialId` for an existing matching-provider workspace connection. Supported pairs: `openai` / `gpt-6-luna` (existing workflows may keep `gpt-5.6-luna`) or `anthropic` / `claude-sonnet-5` or `claude-opus-5`.
 - BYOK costs zero Freckle credits, including web research; the provider bills usage, the workspace connection is revalidated on every model call, and failures never fall back to managed.
 - Each `inputs` entry requires `portId`, `label`, and `type` (`description` is optional).
 - `resultType` must resolve to an exact object type: no optional fields, no `unknown`, no additional properties, no tagged unions. Declare values research may not find as `nullable<...>` fields. This constrains the result-fields table you plan in step 4.
