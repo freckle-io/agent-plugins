@@ -3,11 +3,24 @@
   "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI.",
   "version": "1.0.386",
   "author": {
-    "name": "Freckle"
+    "name": "Freckle",
+    "url": "https://freckle.io"
   },
   "homepage": "https://freckle.io",
   "repository": "https://github.com/freckle-io/agent-plugins",
   "license": "MIT",
+  "keywords": [
+    "freckle",
+    "lead-enrichment",
+    "lead-scoring",
+    "list-building",
+    "prospecting",
+    "sales",
+    "gtm",
+    "b2b-data",
+    "workflows",
+    "cli"
+  ],
   "hooks": {
     "SessionStart": [
       {
