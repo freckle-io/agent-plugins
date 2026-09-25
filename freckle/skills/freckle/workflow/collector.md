@@ -46,17 +46,38 @@ A node accepts at most one incoming activation (`duplicate_activation_target` di
 
 Converge at the **earliest shared value, in the shape the next shared consumer needs** — not at the end of the Workflow, and not in the final output shape. When several branches each produce the same identifier that one downstream provider consumes (a LinkedIn URL feeding a profile-enrichment node), collect the identifier and run **one** provider node after the collector, shared by every branch.
 
-A collector always runs, so it cannot activate the provider only on success by itself. Re-gate with one `switch` on the collector's own string output:
+A collector always runs, so the provider after it needs a gate. Put the gate on the collector itself with `cases` in its config: a `code` node with `cases` selects a Branch Case from its own returned value and still emits `value`.
 
-1. Collector emits the identifier with a sentinel for the miss case (`return input.a ?? input.b ?? '__NO_LINKEDIN_URL__'`, `outputType: string`) — the sentinel keeps the provider's required input type non-nullable. `switch` matches strings exactly, so pick a sentinel no real value can equal (`__NO_LINKEDIN_URL__` when real values are URLs).
-2. A `switch` node binds `value` to the collector's `value`, with `config: { cases: [__NO_LINKEDIN_URL__], defaultCase: found }` — any real identifier falls to `found`, which activates the provider; the provider's required input binds to the collector's `value`.
+1. Collector emits the identifier with a sentinel for the miss case (`return input.a ?? input.b ?? '__NO_LINKEDIN_URL__'`, `outputType: string`) — the sentinel keeps the provider's required input type non-nullable. Cases match strings exactly, so pick a sentinel no real value can equal (`__NO_LINKEDIN_URL__` when real values are URLs).
+2. Add `cases: [__NO_LINKEDIN_URL__]` and `defaultCase: found` to the collector's config — any real identifier falls to `found`. Route `found` to the provider and bind the provider's required input to the collector's `value`:
 
-The `switch` routes on the string directly — one node where a `code`-plus-`if` pair would spend two. Any JS that later consumes the identifier must treat the sentinel as absent (`input.url !== '__NO_LINKEDIN_URL__'`), not test emptiness.
+   ```yaml
+   collectLinkedInUrl:
+     title: Collect LinkedIn URL
+     description: First LinkedIn URL any branch found, or the sentinel when none did.
+     uses: code@<version-from-catalog>
+     config:
+       code: "return input.primary ?? input.fallback ?? '__NO_LINKEDIN_URL__'"
+       inputs:
+         - { portId: primary, type: 'string?' }
+         - { portId: fallback, type: 'string?' }
+       outputType: string
+       cases: [__NO_LINKEDIN_URL__]
+       defaultCase: found
+     with:
+       primary: $nodes.aviatoLookup.linkedInUrl
+       fallback: $nodes.freckleLookup.linkedInUrl
+     cases:
+       found:
+         to: [enrichProfile]
+   ```
 
-Both `code` and `switch` are dynamic nodes: preview both after authoring with `freckle workflow node preview <nodeId> --file workflow.yaml`.
+List every string the code returns in `cases` or cover it with `defaultCase`; any other returned value fails the node. For a yes/no decision, return a boolean with `outputType: boolean` and `cases: ['true', 'false']`, quoted because bare YAML `true`/`false` are booleans, then route `'true':` and `'false':` under the node's `cases` as with `if`. Keep `switch` and `if` for routing on a value that is not computed by a `code` node. Any JS that later consumes the identifier must treat the sentinel as absent (`input.url !== '__NO_LINKEDIN_URL__'`), not test emptiness.
 
-Keep the collector **flat**: emit the bare identifier string. A metadata wrapper (`{ linkedInUrl, linkedInUrlSource }`) costs an extra node — endpoint references cannot reach into object fields, so the wrapper forces a second `code` whose only job is projecting the identifier back out for the `switch` and the provider. Metadata about which branch won belongs in the final formatter: bind the same branch outputs into it as optional inputs and recompute the source there (`input.aviatoUrl ? 'aviato' : input.freckleUrl ? 'freckle' : …`). Emit an object from the collector only when the next shared consumer consumes that whole shape.
+A `code` node is dynamic: preview it after authoring with `freckle workflow node preview <nodeId> --file workflow.yaml` to confirm its case ids.
 
-On a miss the `switch` selects the sentinel case, the provider is Not Selected, and downstream optional bindings (`?`) carry the run onward. A sentinel at the switch is not where the waterfall's Research Agent backstop fires — the backstop is a rung above the collector, activated from the last structured provider's miss branch, so the sentinel means even research came up empty.
+Keep the collector **flat**: emit the bare identifier string. A metadata wrapper (`{ linkedInUrl, linkedInUrlSource }`) costs an extra node — endpoint references cannot reach into object fields, so the wrapper forces a second `code` whose only job is projecting the identifier back out to gate and feed the provider. Metadata about which branch won belongs in the final formatter: bind the same branch outputs into it as optional inputs and recompute the source there (`input.aviatoUrl ? 'aviato' : input.freckleUrl ? 'freckle' : …`). Emit an object from the collector only when the next shared consumer consumes that whole shape.
 
-The same shape gates any conditional provider, not just waterfalls: when a provider needs one field of an upstream object (a company domain off a profile), one `code` projects the field with the sentinel, and one `switch` gates the provider on it.
+On a miss the collector selects the sentinel case, the provider is Not Selected, and downstream optional bindings (`?`) carry the run onward. A sentinel at the collector is not where the waterfall's Research Agent backstop fires — the backstop is a rung above the collector, activated from the last structured provider's miss branch, so the sentinel means even research came up empty.
+
+The same shape gates any conditional provider, not just waterfalls: when a provider needs one field of an upstream object (a company domain off a profile), one `code` projects the field with the sentinel and gates the provider through its own `cases`.

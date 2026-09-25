@@ -141,6 +141,8 @@ nodes:
 
 Omit case entries when no path is needed. The full path is `nodes.<nodeId>.cases.<caseId>.to`, and `to` must be a non-empty list of target node ids. Target arrays cannot repeat the same target node id. Compiler validation rejects self-targeting activations, unknown target nodes, duplicate upstream activations for the same target node, and cases not declared by the source node's contract.
 
+When `code` computes a routing decision, set `config.outputType` to `string` or `boolean` and declare the selectable ids in `config.cases`. Then use the node-level `cases` map to route them. The node still emits its return value on `value`; without `config.cases`, it only emits `value`. See [collector.md](collector.md#re-gating-downstream) for a complete Code routing example.
+
 Data bindings and Branch Cases are separate. A `with` entry says where a node input value comes from; a Branch Case says whether the target node is eligible to run. When a required node input consumes data that is only produced on one branch, bind the data with `with` and route that same Branch Case to the consumer node. If several nodes consume data from the same branch, use a fan-out Branch Case to activate all of them.
 
 ## Type Shorthand
