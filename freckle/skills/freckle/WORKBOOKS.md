@@ -76,7 +76,7 @@ Webhook source output may include an `endpointUrl`. Return an already-obtained e
 
 Record selection is always explicit. Pass exactly one of:
 
-- `--list-id <stable-list-id>` to import members of one HubSpot list. List selection is independent and never combines with filter groups. The Dataset is named after the HubSpot list, and `--label` is only its fallback when HubSpot reports no list name.
+- `--list-id <stable-list-id>` to import members of one HubSpot list. Add `--mirror` to keep Dataset membership synchronized to the complete current list; without it, scheduled list imports remain incremental. Mirror runs add newly seen members and request deletion for members that left without refreshing unchanged entries. List selection is independent and never combines with filter groups. The Dataset is named after the HubSpot list, and `--label` is only its fallback when HubSpot reports no list name.
 - `--all-records` to import every record of the selected object type.
 - `--criteria-json '<json>'` for inline filter-group criteria.
 - `--criteria-file <path>` for filter-group criteria stored in a JSON file. Prefer this for non-trivial filters.
@@ -104,7 +104,7 @@ Always give create and run-again operations an operation-specific stable `--requ
 
 Create may include `--schedule '<cron>' --time-zone '<IANA-zone>'`; provide both or neither. The minimum cadence is 10 minutes. For an existing source, use `hubspot schedule set <workbook-id> <source-id> --schedule '<cron>' --time-zone '<IANA-zone>'`, or `hubspot schedule remove` to stop future scheduled imports. `hubspot run-again` remains a manual run and never changes the schedule.
 
-`hubspot inspect` returns the pinned config, nullable `schedule`, and `latestRun`. Read `latestRun.status` (`pending`, `running`, `completed`, or `failed`), `pagesProcessed`, and `error`; poll inspect when a terminal result is required. A schedule exposes its cron, time zone, disabled state, next run, lock time, and last scheduler error. In the immediate create/run-again response, read the top-level `run` as authoritative: the nested `source.latestRun` can still show the prior run until the next inspect. HubSpot list imports can be scheduled, and scheduled runs are incremental after the initial import.
+`hubspot inspect` returns the pinned config, nullable `schedule`, and `latestRun`. Read `latestRun.status` (`pending`, `running`, `completed`, or `failed`), `pagesProcessed`, and `error`; poll inspect when a terminal result is required. A schedule exposes its cron, time zone, disabled state, next run, lock time, and last scheduler error. In the immediate create/run-again response, read the top-level `run` as authoritative: the nested `source.latestRun` can still show the prior run until the next inspect. HubSpot list imports can be scheduled; scheduled runs use the source's pinned incremental or mirror mode.
 
 ### Manual Salesforce imports
 
