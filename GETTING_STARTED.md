@@ -1,7 +1,7 @@
 # Getting started with Freckle
 
-This guide is written to be followed by an AI coding agent (Claude Code or
-Codex) on a user's behalf. If you are that agent: work through it top to
+This guide is written to be followed by an AI coding agent (Claude Code,
+Cowork, or Codex) on a user's behalf. If you are that agent: work through it top to
 bottom, running the commands yourself and asking the user only when a step
 says to.
 
@@ -34,6 +34,13 @@ preserves any existing `FORCE_AUTOUPDATE_PLUGINS` setting. As a fallback, use
 Existing installs from before this hook shipped need a one-time update to
 receive it: run `/plugin marketplace update freckle-plugins`, then
 `/plugin update freckle@freckle-plugins`, and start a new session.
+
+**Cowork (Claude Desktop):**
+
+Plugins are managed in the app, not from the shell: ask the user to open
+**Customize → Plugins → Add marketplace**, enter `freckle-io/agent-plugins`,
+and install **Freckle**. Plugin hooks do not run in Cowork, so expect a
+permission prompt on each `freckle` command.
 
 **Codex:**
 
