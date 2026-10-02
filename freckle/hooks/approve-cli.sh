@@ -33,11 +33,11 @@ agent="${1:-claude}"
 allowed_helpers="jq cat head tail wc grep sort uniq column tr echo printf"
 
 # `freckle` subcommands that never auto-approve: credential and auth flows
-# (`auth`, `connect`, `connection`, `connections` write or expose credentials),
+# (`login`, legacy `auth`, `connect`, `connection`, `connections` write or expose credentials),
 # plus commands that modify the machine outside the working directory
 # (`skills` writes agent skill directories, `update` replaces the installed
 # binary, `org` can rewrite shared global config via `org switch`).
-gated_subcommands="auth connect connection connections skills update org"
+gated_subcommands="auth login connect connection connections skills update org"
 
 # Harden: no globbing, and unset variables are errors so a typo can't silently
 # widen approval.
@@ -101,7 +101,7 @@ esac
 #     path/URL args are left alone), so the pipeline/chain stays anchored to a
 #     freckle call wherever it sits;
 #   - the `freckle` segment's first non-flag word is refused if it is a gated
-#     subcommand (auth, connect, connection, connections, skills, update, org)
+#     subcommand (auth, login, connect, connection, connections, skills, update, org)
 #     so credential flows and machine-level changes never auto-approve;
 #     ordinary read/build subcommands (workbook, workflow, dataset, credit,
 #     config, status, ...) still do;
