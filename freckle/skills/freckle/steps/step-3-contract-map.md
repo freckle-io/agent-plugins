@@ -18,6 +18,8 @@ When the plan uses Apollo Find People, read [apollo-find-people.md](../workflow/
 
 When the user names a tool or API with no catalog node, or asks to use their own API key, plan an `httpRequest` node against that provider's API and resolve its credential through [CONNECTIONS.md#custom-http-apis](../CONNECTIONS.md#custom-http-apis) — its match policy decides whether a credential is selected, chosen by the user, or set up first.
 
+For a pick-one (tier, category) or yes/no answer that takes judgment on data the row already has, use the `decision` node, Freckle's free classifier: put the user's full rules in each question, fetch any missing facts first, and inspect `decision` for its config. Exact numeric cutoffs and points scores go to Code.
+
 ### Enrichment
 
 Waterfall-first is the default: design enrichment as a provider waterfall even when one provider appears sufficient. Inspect every relevant structured provider node and Research Agent before choosing the plan. Read [waterfall.md](../workflow/waterfall.md) for construction, and [research-agent.md](../workflow/research-agent.md) to decide whether Research Agent is the backstop or the primary node.
