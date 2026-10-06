@@ -1,6 +1,6 @@
 ---
 name: freckle
-description: "Use when the user asks to use the Freckle CLI or get Freckle to do something: enrich/score/process a lead list, build a company or people list, import CRM records, monitor Dataset Signals, build or change Workbooks, datasets, or Workflows, publish or run saved workflows, inspect credit usage or node capabilities, auth/org/config setup, or integration connections."
+description: "Use when the user asks to use the Freckle CLI or get Freckle to do something: enrich/score/process a lead list, build a company or people list, import CRM records, monitor Dataset Signals, push Datasets to LinkedIn, Meta, or Google Ads audiences, build or change Workbooks, datasets, or Workflows, publish or run saved workflows, inspect credit usage or node capabilities, auth/org/config setup, or integration connections."
 ---
 
 # Freckle
@@ -22,9 +22,10 @@ This is a router skill: pick one primary route below and load adjunct references
 | Workbook housekeeping that changes nothing about what runs — inspect, archive, delete entries, rotate webhook secrets | [WORKBOOKS.md](WORKBOOKS.md) |
 | Return a Dataset webhook endpoint URL | [WORKBOOKS.md](WORKBOOKS.md) |
 | Create, inspect, list, turn monitoring on or off, or delete Dataset Signals | [SIGNALS.md](SIGNALS.md) |
+| Push a Dataset to a LinkedIn Ads, Meta Ads, or Google Ads audience, or inspect, turn on or off, reschedule, run, or delete Ad Audience Syncs | [ADS.md](ADS.md) |
 | Check the current credit balance or report credit usage by Workbook, Workflow, or billed node | [CREDITS.md](CREDITS.md) |
 | Log in, check auth, choose org, inspect endpoints | [SETUP.md](SETUP.md) |
-| Connect Apify, ContactOut, HeyReach, HubSpot, Instantly, Lemlist, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |
+| Connect Apify, ContactOut, Google Ads, HeyReach, HubSpot, Instantly, Lemlist, LinkedIn Ads, Meta Ads, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |
 | Set up, list, or pick a credential so Workflows can use the user's own API key — match supported provider BYOK first, then custom HTTP APIs; a build or change request that mentions their own key still routes to BUILD or REFINE | [CONNECTIONS.md](CONNECTIONS.md) |
 | Understand enrichment waterfalls, collectors, or Research Agent usage | [workflow/waterfall.md](workflow/waterfall.md), [workflow/collector.md](workflow/collector.md), [workflow/research-agent.md](workflow/research-agent.md) |
 | Explain what Freckle can currently do — a capability question only, with no task attached | [WHAT-CAN-FRECKLE-DO.md](WHAT-CAN-FRECKLE-DO.md) |

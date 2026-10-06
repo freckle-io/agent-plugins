@@ -41,6 +41,14 @@ campaign ID copied from Twain's campaign “...” menu. The node returns messag
 it uses zero Freckle credits, while Twain may charge the connected account. It does not add the contact to
 the Twain campaign.
 
+LinkedIn Ads (`linkedin_ads`), Meta Ads (`meta_ads`), and Google Ads (`google_ads`) connections each target one ad account, chosen once in Settings → Integrations and
+shown as `adAccount` (`id`, `name`) by `freckle connections show <integration> --json --org-id=<org-id>`;
+`adAccount: null` means none is chosen yet. When creating an Ad Audience Sync ([ADS.md](ADS.md)), show the user each connection's
+ad account name and let them pick; offer only connections whose `status` is exactly `authorized` and that have an
+`adAccount`. If none qualifies, open the connection page with `freckle connections connect <integration> --org-id=<org-id>`
+and ask the user to connect and choose the ad account there. A connection's ad account cannot be changed; another ad
+account needs another connection.
+
 Open the Freckle web app to connect one supported integration:
 
 ```bash
