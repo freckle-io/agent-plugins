@@ -12,6 +12,8 @@
     "displayName": "Freckle",
     "shortDescription": "AI-powered list building, enrichment, and lead scoring from your coding agent.",
     "websiteURL": "https://freckle.io",
+    "logo": "./assets/freckle-dark.png",
+    "composerIcon": "./assets/freckle-dark.png",
     "capabilities": [
       "Read",
       "Write"
