@@ -8,6 +8,7 @@
   "homepage": "https://freckle.io",
   "repository": "https://github.com/freckle-io/agent-plugins",
   "license": "MIT",
+  "icon": "./assets/freckle.png",
   "hooks": {
     "SessionStart": [
       {
