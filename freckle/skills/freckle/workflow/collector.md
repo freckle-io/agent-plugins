@@ -17,7 +17,7 @@ Two situations call for one:
 
 ## Wiring
 
-A node accepts at most one incoming activation (`duplicate_activation_target` diagnostic), so you cannot converge branches by pointing several `cases` at the collector. Converge through data bindings instead:
+A node may be activated by distinct cases from one controlling source: any allowed case makes it eligible once, subject to its input dependencies. Activations from different controlling sources remain invalid (`duplicate_activation_target`). To collect outputs from different provider nodes, converge through data bindings:
 
 - Give the collector **no incoming activation** — no upstream `cases` entry targets it. Its activation gate is open; it is gated only by its data bindings.
 - Declare branch-specific inputs optional in config, using the `?` type-shorthand suffix; bind them in `with` to each branch's output port:
