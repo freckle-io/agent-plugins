@@ -17,19 +17,26 @@ already installed (its skills are visible), skip to step 2.
 
 **Claude Code:**
 
-In Claude Code, run:
+Copy and paste this prompt into Claude Code (a new chat in the Claude app's
+Code tab, or `claude` in a terminal). If you are the agent, carry out its steps
+yourself:
 
-```text
-/plugin marketplace add freckle-io/agent-plugins
-/plugin install freckle@freckle-plugins
-```
+````text
+Install the Freckle plugin for Claude Code for me. Run each step in your shell, skip any step that is already done, and tell me what you did.
 
-The plugin enables auto-update at session start and preserves an explicit
-opt-out. In Claude Desktop, it also enables plugin update checks despite the
-app's disabled CLI updater; restart Desktop if the change has not taken effect.
-This permits checks for all marketplaces already opted into auto-update and
-preserves any existing `FORCE_AUTOUPDATE_PLUGINS` setting. As a fallback, use
-`/plugin` → **Marketplaces** → `freckle-plugins` → **Enable auto-update**.
+1. Find a `claude` binary: use `claude` if it is on PATH. Otherwise, on a Mac, use the newest Claude Desktop copy: `ls -d "$HOME/Library/Application Support/Claude/claude-code/"*/*/claude.app/Contents/MacOS/claude | sort -V | tail -1`. Call it CLAUDE below and quote its path.
+2. If `CLAUDE plugin marketplace list` does not show `freckle-plugins`, run `CLAUDE plugin marketplace add freckle-io/agent-plugins`.
+3. If `CLAUDE plugin list` does not show `freckle@freckle-plugins`, run `CLAUDE plugin install freckle@freckle-plugins`.
+4. Turn on auto-update for this marketplace only: in `~/.claude/settings.json`, set `extraKnownMarketplaces["freckle-plugins"].autoUpdate` to `true`, keeping every other key and value exactly as it is (create the file or keys if missing; keep the existing `source` if there is one). Do not set `FORCE_AUTOUPDATE_PLUGINS` or change any other marketplace.
+5. Run `CLAUDE plugin list` and confirm `freckle@freckle-plugins` is enabled. Then tell me to start a new session (new chat in the Claude app, or restart `claude` in the terminal) and send: "Run the Freckle plugin setup skill and help me sign in to Freckle."
+
+If any step fails, tell me the error and walk me through the manual install instead: run `/plugin marketplace add freckle-io/agent-plugins`, then `/plugin install freckle@freckle-plugins`, then in `/plugin` → Marketplaces → freckle-plugins choose "Enable auto-update".
+````
+
+The plugin enables auto-update for the `freckle-plugins` marketplace at session
+start and preserves an explicit opt-out. It does not change auto-update for any
+other marketplace. As a fallback, use `/plugin` → **Marketplaces** →
+`freckle-plugins` → **Enable auto-update**.
 
 Existing installs from before this hook shipped need a one-time update to
 receive it: run `/plugin marketplace update freckle-plugins`, then
