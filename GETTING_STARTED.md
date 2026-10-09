@@ -22,25 +22,14 @@ Code tab, or `claude` in a terminal). If you are the agent, carry out its steps
 yourself:
 
 ````text
-Install the Freckle plugin for Claude Code for me. Run each step in your shell, skip any step that is already done, and tell me what you did.
+Install the Freckle plugin for Claude Code and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-1. Find a `claude` binary: use `claude` if it is on PATH. Otherwise, on a Mac, use the newest Claude Desktop copy: `ls -d "$HOME/Library/Application Support/Claude/claude-code/"*/*/claude.app/Contents/MacOS/claude | sort -V | tail -1`. Call it CLAUDE below and quote its path.
-2. If `CLAUDE plugin marketplace list` does not show `freckle-plugins`, run `CLAUDE plugin marketplace add freckle-io/agent-plugins`.
-3. If `CLAUDE plugin list` does not show `freckle@freckle-plugins`, run `CLAUDE plugin install freckle@freckle-plugins`.
-4. Turn on auto-update for this marketplace only: in `~/.claude/settings.json`, set `extraKnownMarketplaces["freckle-plugins"].autoUpdate` to `true`, keeping every other key and value exactly as it is (create the file or keys if missing; keep the existing `source` if there is one). Do not set `FORCE_AUTOUPDATE_PLUGINS` or change any other marketplace.
-5. Run `CLAUDE plugin list` and confirm `freckle@freckle-plugins` is enabled. Then sign me in to Freckle: if the Freckle setup skill is available in this chat, run it. Otherwise, unless `freckle whoami --json` already shows `status` `authenticated`, run `freckle login` yourself (if `freckle` isn't on PATH yet, use the newest launcher at `~/.claude/plugins/cache/*/freckle/*/bin/freckle`), show me the one-time code, and wait while I approve it in the browser. Confirm with `freckle whoami --json` that `status` is `authenticated` and tell me which account is signed in. If sign-in can't run here, tell me to start a new chat (or restart `claude`) and send: "Run the Freckle plugin setup skill and help me sign in to Freckle."
+- Add the marketplace `freckle-io/agent-plugins` (it's named `freckle-plugins`) and install the plugin `freckle@freckle-plugins` with the `claude plugin` commands. If `claude` isn't on PATH, use the newest Claude Desktop copy under `~/Library/Application Support/Claude/claude-code/`.
+- Turn on auto-update for this marketplace only: set `extraKnownMarketplaces["freckle-plugins"].autoUpdate` to `true` in `~/.claude/settings.json` and leave everything else in that file as it is. Don't set `FORCE_AUTOUPDATE_PLUGINS`.
+- Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.claude/plugins/cache/*/freckle/*/bin/freckle`.
 
-If any step fails, tell me the error and walk me through the manual install instead: run `/plugin marketplace add freckle-io/agent-plugins`, then `/plugin install freckle@freckle-plugins`, then in `/plugin` → Marketplaces → freckle-plugins choose "Enable auto-update".
+If something fails, tell me the error and how to finish with `/plugin` instead.
 ````
-
-The plugin enables auto-update for the `freckle-plugins` marketplace at session
-start and preserves an explicit opt-out. It does not change auto-update for any
-other marketplace. As a fallback, use `/plugin` → **Marketplaces** →
-`freckle-plugins` → **Enable auto-update**.
-
-Existing installs from before this hook shipped need a one-time update to
-receive it: run `/plugin marketplace update freckle-plugins`, then
-`/plugin update freckle@freckle-plugins`, and start a new session.
 
 **Codex:**
 
@@ -48,13 +37,12 @@ Copy and paste this prompt into a new Codex chat. If you are the agent, carry
 out its steps yourself:
 
 ````text
-Install the Freckle plugin for Codex for me. Run each step in your shell, skip any step that is already done, and tell me what you did.
+Install the Freckle plugin for Codex and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-1. If `codex plugin marketplace list` does not show `freckle-plugins`, run `codex plugin marketplace add freckle-io/agent-plugins`. If it is already there, run `codex plugin marketplace upgrade freckle-plugins` to get the latest version.
-2. If `codex plugin list` does not show `freckle@freckle-plugins` as installed, run `codex plugin add freckle@freckle-plugins`.
-3. Run `codex plugin list` and confirm `freckle@freckle-plugins` is installed and enabled. Then sign me in to Freckle: if the Freckle setup skill is available in this chat, run it. Otherwise, unless `freckle whoami --json` already shows `status` `authenticated`, run `freckle login` yourself (if `freckle` isn't on PATH yet, use the newest launcher at `~/.codex/plugins/cache/*/freckle/*/bin/freckle`), show me the one-time code, and wait while I approve it in the browser. Confirm with `freckle whoami --json` that `status` is `authenticated` and tell me which account is signed in. If sign-in can't run here, tell me to start a new chat (or restart `codex`) and send: "Run the Freckle plugin setup skill and help me sign in to Freckle."
+- Add the marketplace `freckle-io/agent-plugins` (upgrade it if it's already there) and add the plugin `freckle@freckle-plugins` with the `codex plugin` commands.
+- Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.codex/plugins/cache/*/freckle/*/bin/freckle`.
 
-If any step fails, tell me the error and walk me through the manual install instead: in the Codex app, open Plugins → Add → Add a marketplace, paste https://github.com/freckle-io/agent-plugins.git, then in the Personal tab click Add on Freckle.
+If something fails, tell me the error and how to add it in the Codex app instead (Plugins → Add → Add a marketplace, then https://github.com/freckle-io/agent-plugins.git).
 ````
 
 Codex has no background auto-update; to pick up new releases later, run the
