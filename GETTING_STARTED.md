@@ -17,34 +17,36 @@ already installed (its skills are visible), skip to step 2.
 
 **Claude Code:**
 
-In Claude Code, run:
+Copy and paste this prompt into Claude Code (a new chat in the Claude app's
+Code tab, or `claude` in a terminal). If you are the agent, carry out its steps
+yourself:
 
-```text
-/plugin marketplace add freckle-io/agent-plugins
-/plugin install freckle@freckle-plugins
-```
+````text
+Install the Freckle plugin for Claude Code and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-The plugin enables auto-update at session start and preserves an explicit
-opt-out. In Claude Desktop, it also enables plugin update checks despite the
-app's disabled CLI updater; restart Desktop if the change has not taken effect.
-This permits checks for all marketplaces already opted into auto-update and
-preserves any existing `FORCE_AUTOUPDATE_PLUGINS` setting. As a fallback, use
-`/plugin` → **Marketplaces** → `freckle-plugins` → **Enable auto-update**.
+- Add the marketplace `freckle-io/agent-plugins` (it's named `freckle-plugins`) and install the plugin `freckle@freckle-plugins` with the `claude plugin` commands. If `claude` isn't on PATH, use the newest Claude Desktop copy under `~/Library/Application Support/Claude/claude-code/`.
+- Turn on auto-update for this marketplace only: set `extraKnownMarketplaces["freckle-plugins"].autoUpdate` to `true` in `~/.claude/settings.json` and leave everything else in that file as it is. Don't set `FORCE_AUTOUPDATE_PLUGINS`.
+- Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.claude/plugins/cache/*/freckle/*/bin/freckle`.
 
-Existing installs from before this hook shipped need a one-time update to
-receive it: run `/plugin marketplace update freckle-plugins`, then
-`/plugin update freckle@freckle-plugins`, and start a new session.
+If something fails, tell me the error and how to finish with `/plugin` instead.
+````
 
 **Codex:**
 
-```bash
-codex plugin marketplace add freckle-io/agent-plugins
-```
+Copy and paste this prompt into a new Codex chat. If you are the agent, carry
+out its steps yourself:
 
-Then in Codex, run `/plugins` and install **Freckle**.
+````text
+Install the Freckle plugin for Codex and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-Codex has no background auto-update; to pick up new releases later, run
-`codex plugin marketplace upgrade freckle-plugins`.
+- Add the marketplace `freckle-io/agent-plugins` (upgrade it if it's already there) and add the plugin `freckle@freckle-plugins` with the `codex plugin` commands.
+- Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.codex/plugins/cache/*/freckle/*/bin/freckle`.
+
+If something fails, tell me the error and how to add it in the Codex app instead (Plugins → Add → Add a marketplace, then https://github.com/freckle-io/agent-plugins.git).
+````
+
+Codex has no background auto-update; to pick up new releases later, run the
+prompt again (it upgrades the marketplace).
 
 If you can't install the plugin (no plugin support in this host, or policy
 blocks it), fall back to the standalone installer, which installs the CLI and
@@ -63,13 +65,14 @@ Run the plugin's **`setup`** skill (`freckle:setup` in Claude Code). If you
 can't invoke skills yet (for example, the plugin was installed this session),
 do what it does:
 
-1. Check state: `freckle auth status; echo "exit_code=$?"`
+1. Check state: `freckle whoami --json`. It exits 0 either way; `"status":
+   "authenticated"` means signed in, `"not-authenticated"` means not.
 2. If `freckle` is not found, use the bundled launcher at `bin/freckle` inside
    the installed plugin directory (it downloads and checksum-verifies the real
    CLI on first use), and put it on PATH per the setup skill.
-3. Sign in with `freckle auth` — a device flow that opens the user's browser
+3. Sign in with `freckle login` — a device flow that opens the user's browser
    and prints a one-time code. Show the user the code and tell them to approve
-   it in the browser. Confirm with `freckle auth status`.
+   it in the browser. Confirm `freckle whoami --json` reports `"status": "authenticated"`.
 
 ## 3. Pick the organization
 
