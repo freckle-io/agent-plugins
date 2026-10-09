@@ -44,14 +44,21 @@ receive it: run `/plugin marketplace update freckle-plugins`, then
 
 **Codex:**
 
-```bash
-codex plugin marketplace add freckle-io/agent-plugins
-```
+Copy and paste this prompt into a new Codex chat. If you are the agent, carry
+out its steps yourself:
 
-Then in Codex, run `/plugins` and install **Freckle**.
+````text
+Install the Freckle plugin for Codex for me. Run each step in your shell, skip any step that is already done, and tell me what you did.
 
-Codex has no background auto-update; to pick up new releases later, run
-`codex plugin marketplace upgrade freckle-plugins`.
+1. If `codex plugin marketplace list` does not show `freckle-plugins`, run `codex plugin marketplace add freckle-io/agent-plugins`. If it is already there, run `codex plugin marketplace upgrade freckle-plugins` to get the latest version.
+2. If `codex plugin list` does not show `freckle@freckle-plugins` as installed, run `codex plugin add freckle@freckle-plugins`.
+3. Run `codex plugin list` and confirm `freckle@freckle-plugins` is installed and enabled. Then tell me to start a new chat and send: "Run the Freckle plugin setup skill and help me sign in to Freckle."
+
+If any step fails, tell me the error and walk me through the manual install instead: in the Codex app, open Plugins → Add → Add a marketplace, paste https://github.com/freckle-io/agent-plugins.git, then in the Personal tab click Add on Freckle.
+````
+
+Codex has no background auto-update; to pick up new releases later, run the
+prompt again (it upgrades the marketplace).
 
 If you can't install the plugin (no plugin support in this host, or policy
 blocks it), fall back to the standalone installer, which installs the CLI and
