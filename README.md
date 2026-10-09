@@ -43,7 +43,7 @@ Workbook, gates the run on a sample and a credit forecast, then runs the rest.
 
 New here? Point your coding agent at **[`GETTING_STARTED.md`](./GETTING_STARTED.md)**
 and ask it to set Freckle up for you. It walks through installing the plugin,
-getting `freckle` on PATH, and signing in with `freckle auth`.
+getting `freckle` on PATH, and signing in with `freckle login`.
 
 **If you're an agent reading this directly:** read
 [`GETTING_STARTED.md`](./GETTING_STARTED.md) and follow it.
@@ -74,7 +74,7 @@ Then open Codex, run `/plugins`, and install **Freckle**.
 
 Start a new session and ask your agent to *"set up Freckle"* — the plugin's
 `setup` skill puts the bundled `freckle` CLI on your PATH (downloading a
-checksum-verified binary on first use) and signs you in with `freckle auth`.
+checksum-verified binary on first use) and signs you in with `freckle login`.
 
 ## What's inside
 
@@ -118,7 +118,7 @@ decide — the hook fails closed.
 skills plus WebFetch/WebSearch, nothing else.
 
 **Credentials stay in the CLI.** The plugin ships no secrets and stores none;
-authentication happens through `freckle auth` in the CLI's own config, and
+authentication happens through `freckle login` in the CLI's own config, and
 credential-touching commands always prompt (see above).
 
 ### Release automation
