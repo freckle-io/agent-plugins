@@ -77,13 +77,14 @@ Run the plugin's **`setup`** skill (`freckle:setup` in Claude Code). If you
 can't invoke skills yet (for example, the plugin was installed this session),
 do what it does:
 
-1. Check state: `freckle auth status; echo "exit_code=$?"`
+1. Check state: `freckle whoami --json`. It exits 0 either way; `"status":
+   "authenticated"` means signed in, `"not-authenticated"` means not.
 2. If `freckle` is not found, use the bundled launcher at `bin/freckle` inside
    the installed plugin directory (it downloads and checksum-verifies the real
    CLI on first use), and put it on PATH per the setup skill.
-3. Sign in with `freckle auth` — a device flow that opens the user's browser
+3. Sign in with `freckle login` — a device flow that opens the user's browser
    and prints a one-time code. Show the user the code and tell them to approve
-   it in the browser. Confirm with `freckle auth status`.
+   it in the browser. Confirm `freckle whoami --json` reports `"status": "authenticated"`.
 
 ## 3. Pick the organization
 
