@@ -11,7 +11,7 @@ Contract facts that shape the plan (inspect `researchAgent` for the full contrac
 - Each `inputs` entry requires `portId`, `label`, and `type` (`description` is optional).
 - `resultType` must resolve to an exact object type: no optional fields, no `unknown`, no additional properties, no tagged unions. Declare values research may not find as `nullable<...>` fields. This constrains the result-fields table you plan in step 4.
 - It emits `result` (typed by `resultType`), `steps`, and an optional `sources` output port; it selects no branch cases.
-- A "not found" outcome lives inside a successful `result`; a runtime node failure fails the Workflow Run.
+- A "not found" outcome lives inside a successful `result`; a runtime node failure fails the Workflow Run unless the node declares `onFailure` (see [draft-syntax.md](draft-syntax.md#failure-routes)).
 
 When the user chooses BYOK, follow [OpenAI setup](../CONNECTIONS.md#openai-for-research-agent) or [Anthropic setup](../CONNECTIONS.md#anthropic-for-research-agent) to select an authorized workspace credential before setting `model.credentialId`.
 

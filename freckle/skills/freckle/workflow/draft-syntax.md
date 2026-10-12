@@ -121,7 +121,34 @@ outputs:
 
 All `oneOf` entries for one Workflow Output must use the same guard Workflow Node. Each entry pairs one guard Branch Case with one source Node Output Port. Guarded sources cannot reference Workflow Inputs or outputs from the guard node itself; the source node must be downstream of the named Branch Case through Activation Ancestry. A single-entry `oneOf` is valid.
 
-Runtime selection uses the guard node's exact Selected Branch Case. It is not first source, first present value, or first non-missing source. Non-selected guarded sources are ignored. If no guard case matches, required outputs fail and Optional outputs are omitted. Node failures still fail the Workflow Run regardless of output optionality.
+Runtime selection uses the guard node's exact Selected Branch Case. It is not first source, first present value, or first non-missing source. Non-selected guarded sources are ignored. If no guard case matches, required outputs fail and Optional outputs are omitted. Node failures still fail the Workflow Run regardless of output optionality, unless the failed node declares a Failure Route.
+
+## Failure Routes
+
+By default any node failure fails the whole Workflow Run. `onFailure` routes a node's failure to other nodes instead:
+
+```yaml
+nodes:
+  forager:
+    uses: foragerFindPersonalEmail@1.0.0
+    with:
+      linkedInUrl: $inputs.linkedin_url
+    cases:
+      not_found:
+        to:
+          - limadata
+    onFailure:
+      to:
+        - limadata
+```
+
+`onFailure.to` is a non-empty list of target node ids with no repeats, and works on any node, including nodes with no Branch Cases. It is one more alternative of the same source node, so it can share a target with that node's cases; a target still cannot be activated by two different source nodes.
+
+- Routed: provider outages, rate limits and timeouts after the node's own retries (`provider_unavailable`), unexpected failures (`internal`), and rejected input values (`invalid_input`).
+- Still fails the run: `invalid_config` and `connection` failures. Fix the node config or the credential; a fallback must not hide them.
+- A failed node has no outputs. Bind its outputs only into Optional (`?`) inputs downstream, as a [collector](collector.md) does; a node that requires them is Not Selected. A node reached only through `onFailure` cannot require the failed node's output — the compiler rejects it.
+- A guarded Workflow Output cannot be guarded on failure. If its guard node fails with a route, an Optional output is omitted and a required output fails the run.
+- The run finishes `completed` and its data lists the failed nodes in `routedFailedNodeIds`, with each node's error in `routedNodeFailures`.
 
 ## Branch Cases
 
