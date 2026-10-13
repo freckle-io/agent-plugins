@@ -1,0 +1,33 @@
+{
+  "name": "freckle-mcp",
+  "version": "0.1.0",
+  "description": "Build lists, enrich leads, author workflows, import CRM data and sync Ads audiences through Freckle MCP. No Freckle CLI required.",
+  "author": {
+    "name": "Freckle"
+  },
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Freckle MCP",
+    "shortDescription": "GTM workflows through MCP",
+    "longDescription": "Build lists, enrich leads, author workflows, import CRM data and sync Ads audiences through Freckle MCP. No Freckle CLI required.",
+    "developerName": "Freckle",
+    "category": "Productivity",
+    "websiteURL": "https://freckle.io",
+    "privacyPolicyURL": "https://freckle.io/privacy-policy",
+    "termsOfServiceURL": "https://freckle.io/terms-of-service",
+    "logo": "./assets/freckle-light.png",
+    "logoDark": "./assets/freckle-dark.png",
+    "composerIcon": "./assets/freckle-light.png",
+    "defaultPrompt": [
+      "Find 100 RevOps leaders at US SaaS companies and verify their emails.",
+      "Import HubSpot companies missing a domain or key contact, then find the missing domains and decision-makers.",
+      "Find US fintech companies that raised funding in the last 90 days, find their Head of Sales and verify their email address."
+    ],
+    "capabilities": [
+      "Read",
+      "Write"
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "freckle-mcp",
+  "description": "Build lists, enrich leads, author workflows, import CRM data and sync Ads audiences through Freckle MCP. No Freckle CLI required.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Freckle"
+  },
+  "homepage": "https://freckle.io",
+  "repository": "https://github.com/freckle-io/agent-plugins",
+  "license": "MIT",
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
+}

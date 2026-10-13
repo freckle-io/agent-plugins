@@ -11,6 +11,11 @@
       "name": "freckle",
       "source": "./freckle",
       "description": "Build with Freckle in your coding agent — AI-powered list building, enrichment, lead scoring, and saved Workflows through agent skills and the freckle CLI."
+    },
+    {
+      "name": "freckle-mcp",
+      "source": "./freckle-mcp",
+      "description": "Experimental full Freckle MCP server connection and MCP-native skill."
     }
   ]
 }

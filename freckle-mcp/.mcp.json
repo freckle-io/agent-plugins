@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "freckle": {
+      "type": "http",
+      "url": "http://localhost:4003/mcp/full"
+    }
+  }
+}
