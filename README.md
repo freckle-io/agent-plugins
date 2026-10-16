@@ -67,8 +67,13 @@ This URL needs no git. If you already use git, `/plugin marketplace add freckle-
 ### Codex
 
 ```bash
-codex plugin marketplace add freckle-io/agent-plugins
+curl -fsSL https://plugins.freckle.io/codex/freckle-plugins.zip -o /tmp/freckle-plugins.zip
+mkdir -p ~/.codex/marketplaces && rm -rf ~/.codex/marketplaces/freckle-plugins
+unzip -q /tmp/freckle-plugins.zip -d ~/.codex/marketplaces
+codex plugin marketplace add ~/.codex/marketplaces/freckle-plugins
 ```
+
+This needs no git; run it again to upgrade. If you already use git, `codex plugin marketplace add freckle-io/agent-plugins` adds the same marketplace.
 
 Then open Codex, run `/plugins`, and install **Freckle**.
 

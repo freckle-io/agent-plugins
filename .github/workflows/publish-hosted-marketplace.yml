@@ -2,7 +2,9 @@ name: Publish hosted marketplace
 
 # Publishes a git-free marketplace to Cloudflare R2 so users can run
 #   /plugin marketplace add <R2_PLUGINS_PUBLIC_BASE_URL>/marketplace.json
-# without git (and without the macOS command line tools prompt).
+# without git (and without the macOS command line tools prompt). Codex users
+# download <R2_PLUGINS_PUBLIC_BASE_URL>/codex/freckle-plugins.zip, unzip it
+# and add the folder as a local marketplace.
 
 on:
   push:
@@ -43,6 +45,12 @@ jobs:
             --endpoint-url "$R2_ENDPOINT" \
             --content-type application/zip \
             --cache-control "public, max-age=31536000, immutable"
+
+      - name: Upload Codex marketplace zip (stable URL)
+        run: |
+          aws s3 cp dist-hosted/codex "s3://$R2_BUCKET/codex" --recursive \
+            --endpoint-url "$R2_ENDPOINT" \
+            --cache-control "public, max-age=60"
 
       # Uploaded last so it never points at an archive that isn't there yet.
       - name: Upload marketplace.json (stable URL)
