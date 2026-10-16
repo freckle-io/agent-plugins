@@ -58,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/freckle-io/agent-plugins/main/GETTI
 ### Claude Code
 
 ```
-/plugin marketplace add https://plugins.freckle.io/marketplace.json
+/plugin marketplace add https://pub-4e5cef62a7ec41548f898cbba9bdcaf3.r2.dev/marketplace.json
 /plugin install freckle@freckle-plugins
 ```
 
@@ -67,7 +67,7 @@ This URL needs no git. If you already use git, `/plugin marketplace add freckle-
 ### Codex
 
 ```bash
-curl -fsSL https://plugins.freckle.io/codex/freckle-plugins.zip -o /tmp/freckle-plugins.zip
+curl -fsSL https://pub-4e5cef62a7ec41548f898cbba9bdcaf3.r2.dev/codex/freckle-plugins.zip -o /tmp/freckle-plugins.zip
 mkdir -p ~/.codex/marketplaces && rm -rf ~/.codex/marketplaces/freckle-plugins
 unzip -q /tmp/freckle-plugins.zip -d ~/.codex/marketplaces
 codex plugin marketplace add ~/.codex/marketplaces/freckle-plugins
