@@ -72,41 +72,21 @@ Webhook source output may include an `endpointUrl`. Return an already-obtained e
 
 ### Manual HubSpot imports
 
-`hubspot create` creates a new Dataset, configures its source, and starts the first import; it does not attach HubSpot to an existing Dataset. Get an authorized public credential ID with `connections show hubspot --org-id <org-id>`, select `contacts`, `companies`, or `deals` with `--object-type`, and repeat `--property` in the order fields should be retained. `--description` is optional.
+Read the selected command's `--help` before composing any `hubspot` command. Help owns syntax, examples, selection criteria, constraints, and output shapes.
 
-Record selection is always explicit. Pass exactly one of:
+| Goal | Command |
+| --- | --- |
+| Import HubSpot records into a new Dataset, once or on a schedule | `freckle workbook dataset hubspot create` |
+| Check an import, its schedule, and where the next import starts | `freckle workbook dataset hubspot inspect` |
+| Import what is new since the last import, now | `freckle workbook dataset hubspot fetch-next-batch` |
+| Add, change, or delete a schedule | `freckle workbook dataset hubspot schedule set` or `schedule remove` |
+| Stop scheduled imports for a while, then continue where they stopped | `freckle workbook dataset hubspot schedule pause` and `schedule resume` |
+| Start the next list import from a chosen time | `freckle workbook dataset hubspot checkpoint` |
 
-- `--list-id <stable-list-id>` to import members of one HubSpot list. Add `--mirror` to keep Dataset membership synchronized to the complete current list; without it, scheduled list imports remain incremental. Mirror runs add newly seen members and request deletion for members that left without refreshing unchanged entries. List selection is independent and never combines with filter groups. The Dataset is named after the HubSpot list, and `--label` is only its fallback when HubSpot reports no list name.
-- `--all-records` to import every record of the selected object type.
-- `--criteria-json '<json>'` for inline filter-group criteria.
-- `--criteria-file <path>` for filter-group criteria stored in a JSON file. Prefer this for non-trivial filters.
-
-For `--criteria-json` or `--criteria-file`, use the complete `HubspotDatasetImportCriteria` shape and preserve nested groups:
-
-```json
-{
-  "kind": "filter_groups",
-  "filterGroups": [
-    {
-      "filters": [
-        { "propertyName": "lifecyclestage", "operator": "EQ", "value": "customer" },
-        { "propertyName": "country", "operator": "IN", "values": ["India", "Singapore"] }
-      ]
-    },
-    { "filters": [{ "propertyName": "annualrevenue", "operator": "GTE", "value": "1000000" }] }
-  ]
-}
-```
-
-Filters within one group are ANDed; groups are ORed — pass the complete nested JSON as one value so that structure survives. Criteria allow 1–5 groups, 1–6 filters per group, and 18 filters total. Select 1–200 unique properties. Supported operators are `EQ`, `NEQ`, `GT`, `GTE`, `LT`, `LTE`, `CONTAINS_TOKEN`, `NOT_CONTAINS_TOKEN`, `IN`, `NOT_IN`, `BETWEEN`, `HAS_PROPERTY`, and `NOT_HAS_PROPERTY`. Single-value operators use `value`; `IN`/`NOT_IN` use a non-empty `values` array; `BETWEEN` uses `value` and `highValue`; property-existence operators take none of those fields.
-
-Always give create and fetch-next-batch operations an operation-specific stable `--request-id`. Retrying create with the same request ID in the same Workbook returns the original source/run; retrying fetch-next-batch with the same request ID for an unscheduled source returns the original run. A genuinely new import gets a fresh ID.
-
-Create may include `--schedule '<cron>' --time-zone '<IANA-zone>'`; provide both or neither. The minimum cadence is 10 minutes. For an existing source, use `hubspot schedule set <workbook-id> <source-id> --schedule '<cron>' --time-zone '<IANA-zone>'`, or `hubspot schedule remove` to stop future scheduled imports. `schedule set` keeps the schedule's checkpoint; a recreated schedule resumes after the last successful import.
-
-An incremental `--list-id` import tracks a **checkpoint**: when a member joined the list. Each import takes only members added strictly after it. To start from a known time, pass `--since '<RFC 3339 time with offset>'` (for example `2026-10-14T09:00:00-07:00`) to `create`; responses report the stored UTC value as `since` on `run` and `schedule`. `hubspot fetch-next-batch` imports the members added since the last successful import; on a scheduled source it runs the next scheduled import now, returns a null `run`, and fails while an import is active. Because that run is created moments later, note `latestRun.id` before fetching and wait until inspect shows a different `latestRun.id` with status `completed` and a null `cursor`. A scheduled list import brings in at most 50,000 records per run; when more are waiting, it keeps importing them in batches of 50,000, 5 seconds apart.
-
-`hubspot inspect` returns the pinned config, nullable `schedule`, and `latestRun`. Read `latestRun.status` (`pending`, `running`, `completed`, or `failed`), `pagesProcessed`, and `error`; poll inspect when a terminal result is required. A schedule exposes its cron, time zone, disabled state, next run, lock time, and last scheduler error. In the immediate create/fetch-next-batch response, read the top-level `run` as authoritative: the nested `source.latestRun` can still show the prior run until the next inspect. HubSpot list imports can be scheduled; scheduled runs use the source's pinned incremental or mirror mode.
+- `hubspot create` always creates a new Dataset. Get an authorized credential ID with `freckle connections show hubspot --org-id <org-id>`.
+- Select records only as the user approved: one list, all records, or filter-group criteria. Never guess a list ID or filter.
+- Give each create and fetch-next-batch its own stable `--request-id`, and reuse an ID only to retry that same operation.
+- Before relying on an import's entries, wait for it as `hubspot fetch-next-batch --help` describes: a scheduled source returns a null `run`, and a large list arrives in several batches.
 
 ### Manual Salesforce imports
 
