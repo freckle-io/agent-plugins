@@ -43,7 +43,7 @@ Install the Freckle plugin for Codex and sign me in to Freckle. Skip anything th
 - Add that folder as a marketplace (skip if it's already added) and add the plugin `freckle@freckle-plugins` with the `codex plugin` commands.
 - Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.codex/plugins/cache/*/freckle/*/bin/freckle`.
 
-If something fails, tell me the error and how to add it in the Codex app instead (Plugins → Add → Add a marketplace, then the `~/.codex/marketplaces/freckle-plugins` folder).
+If something fails, tell me the error. If the download failed, tell me to check my connection and paste this again. If `~/.codex/marketplaces/freckle-plugins` exists but adding it failed, tell me how to add that folder in the Codex app instead (Plugins → Add → Add a marketplace).
 ````
 
 Codex has no background auto-update; to pick up new releases later, run the
