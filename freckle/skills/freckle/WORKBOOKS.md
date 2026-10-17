@@ -90,22 +90,22 @@ Read the selected command's `--help` before composing any `hubspot` command. Hel
 
 ### Manual Salesforce imports
 
-```bash
-freckle workbook dataset salesforce objects --credential-id <credential-id>
-freckle workbook dataset salesforce fields --credential-id <credential-id> --object-type Contact
-freckle workbook dataset salesforce list-views --credential-id <credential-id> --object-type Contact
-freckle workbook dataset salesforce create <workbook-id> --label "SF Contacts" --credential-id <credential-id> --object-type Contact --property Email --property FirstName --list-id <list-view-id> --request-id <stable-request-id>
-freckle workbook dataset salesforce soql preview --credential-id <credential-id> --file /absolute/path/contacts.soql --json
-freckle workbook dataset salesforce create <workbook-id> --label "SF Contacts" --credential-id <credential-id> --soql-file /absolute/path/contacts.soql --request-id <stable-request-id>
-freckle workbook dataset salesforce inspect <workbook-id> <source-id>
-freckle workbook dataset salesforce run-again <workbook-id> <source-id> --request-id <stable-request-id>
-freckle workbook dataset salesforce schedule set <workbook-id> <source-id> --schedule '<cron>' --time-zone '<IANA-zone>'
-freckle workbook dataset salesforce schedule remove <workbook-id> <source-id>
-```
+Read the selected command's `--help` before composing any `salesforce` command. Help owns syntax, examples, selection, constraints, and output shapes.
 
-Like `hubspot create`, `salesforce create` creates a new Dataset and configures its source. Without a schedule it also starts the first import; with `--schedule` it only creates the scheduled source. Discover before creating: `objects` lists queryable objects, `fields` lists an object's field API names, and `list-views` lists its list views. Repeat `--property` with 1–200 field API names in the order fields should be retained. Pass exactly one of `--list-id <list-view-id>` (import one list view's members; add `--mirror` to keep Dataset membership synchronized to the complete current list view, adding newly seen records and requesting deletion for records that left without refreshing unchanged entries; a mirror schedule may run at most once every 60 minutes), `--new-objects` (import objects incrementally), or `--soql-file <path>` (import records matching custom SOQL). With `--list-id` the Dataset is named after the Salesforce list view, and `--label` is only its fallback when Salesforce reports no list-view name. `--backfill` applies only with `--new-objects` and accepts exactly `24 hours`, `7 days`, `30 days`, `90 days`, `365 days`, or `1000 weeks`. Give each create or run-again a stable `--request-id`, and provide `--schedule` and `--time-zone` together.
+| Goal | Command |
+| --- | --- |
+| Find objects, fields, and list views to import | `freckle workbook dataset salesforce objects`, `fields`, or `list-views` |
+| Check custom SOQL before importing it | `freckle workbook dataset salesforce soql preview` |
+| Import Salesforce records into a new Dataset, once or on a schedule | `freckle workbook dataset salesforce create` |
+| Check an import and its schedule | `freckle workbook dataset salesforce inspect` |
+| Import what is new since the last import, now | `freckle workbook dataset salesforce fetch-next-batch` |
+| Add, change, or delete a schedule | `freckle workbook dataset salesforce schedule set` or `schedule remove` |
 
-**Custom SOQL preview gate:** Write custom SOQL to an absolute file, then run `salesforce soql preview` against that exact file before `salesforce create --soql-file`. Preview compiles the query with Freckle's required record fields and importer-owned pagination, asks Salesforce for at most 10 rows, and exits nonzero when the query cannot be imported. Inspect the returned object, fields, effective SOQL, and rows; revise and preview again until the command exits 0 and the shape matches the goal. Zero rows is a valid preview: tell the user it matched nothing and adjust the filters when that misses the goal. Custom `SELECT` lists support 1–200 direct fields; the importer owns `ORDER BY`, `LIMIT`, and `OFFSET`, and rejects aggregate, grouped, relationship-select, alias, function, and subquery shapes.
+- `salesforce create` always creates a new Dataset. Get an authorized credential ID with `freckle connections show salesforce --org-id <org-id>`.
+- Select records only as the user approved: one list view, new records of one object, or custom SOQL. Never guess a list view or query.
+- **Custom SOQL preview gate:** write the SOQL to an absolute file and run `salesforce soql preview` on that exact file until it exits 0 and the object, fields, and rows match the goal; only then run `salesforce create --soql-file` with the same file. Zero rows is a valid preview: tell the user it matched nothing and adjust the filters when that misses the goal.
+- Give each create and fetch-next-batch its own stable `--request-id`, and reuse an ID only to retry that same operation.
+- Before relying on an import's entries, wait for it as `salesforce fetch-next-batch --help` describes: a scheduled source returns a null `run`.
 
 ## Field catalogs
 
