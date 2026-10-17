@@ -30,6 +30,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_PLUGINS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_PLUGINS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: auto
+      # Newer AWS CLIs send checksum headers by default, which R2 can reject.
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
     steps:
       - uses: actions/checkout@v4
 
@@ -60,15 +63,20 @@ jobs:
             --content-type application/json \
             --cache-control "public, max-age=60"
 
+      # curl, not Python: r2.dev answers Python's default user agent with 403.
       - name: Verify public URLs and checksums
         run: |
+          set -euo pipefail
           curl -fsS "$R2_PUBLIC_BASE_URL/marketplace.json" -o served.json
-          python3 - <<'PY'
-          import hashlib, json, urllib.request
-          for p in json.load(open("served.json"))["plugins"]:
-              s = p["source"]
-              if isinstance(s, dict) and s.get("source") == "archive":
-                  data = urllib.request.urlopen(s["url"]).read()
-                  assert hashlib.sha256(data).hexdigest() == s["sha256"], s["url"]
-                  print("ok", s["url"])
-          PY
+          jq -r '.plugins[].source | select(type == "object" and .source == "archive") | "\(.sha256) \(.url)"' served.json |
+            while read -r sha url; do
+              got=$(curl -fsS "$url" | sha256sum | cut -d' ' -f1)
+              [ "$got" = "$sha" ] || { echo "sha256 mismatch: $url"; exit 1; }
+              echo "ok $url"
+            done
+          for zip in dist-hosted/codex/*.zip; do
+            url="$R2_PUBLIC_BASE_URL/codex/$(basename "$zip")"
+            got=$(curl -fsS "$url" | sha256sum | cut -d' ' -f1)
+            [ "$got" = "$(curl -fsS "$url.sha256" | tr -d '[:space:]')" ] || { echo "sha256 mismatch: $url"; exit 1; }
+            echo "ok $url"
+          done
