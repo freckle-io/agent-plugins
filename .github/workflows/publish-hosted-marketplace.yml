@@ -1,0 +1,74 @@
+name: Publish hosted marketplace
+
+# Publishes a git-free marketplace to Cloudflare R2 so users can run
+#   /plugin marketplace add <R2_PLUGINS_PUBLIC_BASE_URL>/marketplace.json
+# without git (and without the macOS command line tools prompt). Codex users
+# download <R2_PLUGINS_PUBLIC_BASE_URL>/codex/freckle-plugins.zip, unzip it
+# and add the folder as a local marketplace.
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: publish-hosted-marketplace
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      R2_BUCKET: ${{ vars.R2_PLUGINS_BUCKET }}
+      R2_PUBLIC_BASE_URL: ${{ vars.R2_PLUGINS_PUBLIC_BASE_URL }}
+      R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_PLUGINS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_PLUGINS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build archives and marketplace.json
+        run: |
+          chmod +x scripts/build-hosted-marketplace.py
+          python3 scripts/build-hosted-marketplace.py \
+            "$R2_PUBLIC_BASE_URL" dist-hosted "${GITHUB_SHA::12}"
+
+      - name: Upload plugin archives (immutable paths)
+        run: |
+          aws s3 cp dist-hosted/plugins "s3://$R2_BUCKET/plugins" --recursive \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type application/zip \
+            --cache-control "public, max-age=31536000, immutable"
+
+      - name: Upload Codex marketplace zip (stable URL)
+        run: |
+          aws s3 cp dist-hosted/codex "s3://$R2_BUCKET/codex" --recursive \
+            --endpoint-url "$R2_ENDPOINT" \
+            --cache-control "public, max-age=60"
+
+      # Uploaded last so it never points at an archive that isn't there yet.
+      - name: Upload marketplace.json (stable URL)
+        run: |
+          aws s3 cp dist-hosted/marketplace.json "s3://$R2_BUCKET/marketplace.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type application/json \
+            --cache-control "public, max-age=60"
+
+      - name: Verify public URLs and checksums
+        run: |
+          curl -fsS "$R2_PUBLIC_BASE_URL/marketplace.json" -o served.json
+          python3 - <<'PY'
+          import hashlib, json, urllib.request
+          for p in json.load(open("served.json"))["plugins"]:
+              s = p["source"]
+              if isinstance(s, dict) and s.get("source") == "archive":
+                  data = urllib.request.urlopen(s["url"]).read()
+                  assert hashlib.sha256(data).hexdigest() == s["sha256"], s["url"]
+                  print("ok", s["url"])
+          PY
