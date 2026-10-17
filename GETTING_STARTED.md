@@ -24,7 +24,7 @@ yourself:
 ````text
 Install the Freckle plugin for Claude Code and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-- Add the marketplace `freckle-io/agent-plugins` (it's named `freckle-plugins`) and install the plugin `freckle@freckle-plugins` with the `claude plugin` commands. If `claude` isn't on PATH, use the newest Claude Desktop copy under `~/Library/Application Support/Claude/claude-code/`.
+- Add the marketplace from `https://pub-4e5cef62a7ec41548f898cbba9bdcaf3.r2.dev/marketplace.json` (it's named `freckle-plugins`; this URL needs no git) and install the plugin `freckle@freckle-plugins` with the `claude plugin` commands. If `claude` isn't on PATH, use the newest Claude Desktop copy under `~/Library/Application Support/Claude/claude-code/`. Only if that URL can't be reached and git already works here, add `freckle-io/agent-plugins` instead; never install git or the command line developer tools for this.
 - Turn on auto-update for this marketplace only: set `extraKnownMarketplaces["freckle-plugins"].autoUpdate` to `true` in `~/.claude/settings.json` and leave everything else in that file as it is. Don't set `FORCE_AUTOUPDATE_PLUGINS`.
 - Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.claude/plugins/cache/*/freckle/*/bin/freckle`.
 
@@ -39,10 +39,11 @@ out its steps yourself:
 ````text
 Install the Freckle plugin for Codex and sign me in to Freckle. Skip anything that's already done, and tell me what you did.
 
-- Add the marketplace `freckle-io/agent-plugins` (upgrade it if it's already there) and add the plugin `freckle@freckle-plugins` with the `codex plugin` commands.
+- Get the marketplace without git, even if it's already there (this is how it upgrades): download `https://pub-4e5cef62a7ec41548f898cbba9bdcaf3.r2.dev/codex/freckle-plugins.zip` and its `.sha256` with `curl -fsSL`, check the zip with `shasum -a 256`, unzip it into a new temp folder, and replace `~/.codex/marketplaces/freckle-plugins` with the `freckle-plugins` folder inside. Only if the download fails and git already works here, use `freckle-io/agent-plugins` instead; never install git or the command line developer tools for this.
+- Add that folder as a marketplace (skip if it's already added) and add the plugin `freckle@freckle-plugins` with the `codex plugin` commands.
 - Sign me in: if the Freckle setup skill is available here, run it. Otherwise check `freckle whoami --json`, and if I'm not signed in, run `freckle login`, show me the code and wait while I approve it in the browser. If `freckle` isn't on PATH, use the plugin's copy at `~/.codex/plugins/cache/*/freckle/*/bin/freckle`.
 
-If something fails, tell me the error and how to add it in the Codex app instead (Plugins → Add → Add a marketplace, then https://github.com/freckle-io/agent-plugins.git).
+If something fails, tell me the error. If the download failed, tell me to check my connection and paste this again. If `~/.codex/marketplaces/freckle-plugins` exists but adding it failed, tell me how to add that folder in the Codex app instead (Plugins → Add → Add a marketplace).
 ````
 
 Codex has no background auto-update; to pick up new releases later, run the
