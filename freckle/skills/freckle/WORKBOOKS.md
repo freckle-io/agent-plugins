@@ -18,7 +18,7 @@ freckle workbook archive <workbook-id>
 freckle workbook unarchive <workbook-id>
 ```
 
-`workbook list` rows include each Workbook's Datasets (`id`, `label`, `fieldPaths`, `archivedAt`) and connections (`workflowId`, input/output dataset ids, `triggerPolicy`) — enough to see what every Workbook does without inspecting each one. `workbook inspect` returns the full graph: Datasets with complete field catalogs, and connections with input mappings and unfold config. Archived Datasets stay visible in both (connections may still reference them) with `archivedAt` set; they refuse ingestion and triggers.
+`workbook list` rows include each Workbook's Datasets (`id`, `label`, `fieldPaths`, `archivedAt`) and connections (`workflowId`, input/output dataset ids, `triggerPolicy`, `archivedAt`) — enough to see what every Workbook does without inspecting each one. `workbook inspect` returns the full graph: Datasets with complete field catalogs, and connections with input mappings and unfold config. Archived Datasets and connections stay visible in both with `archivedAt` set; they refuse ingestion and triggers.
 
 ## Datasets
 
@@ -132,9 +132,12 @@ freckle workbook dataset connection run <workbook-id> <connection-id> <entry-id>
 freckle workbook dataset connection rerun-failed <workbook-id> <connection-id>
 freckle workbook dataset connection runs <workbook-id> <connection-id> --limit 25
 freckle workbook dataset connection set-trigger-policy <workbook-id> <connection-id> --trigger-policy auto
+freckle workbook dataset connection archive <workbook-id> <connection-id>
 ```
 
 `connection create` requires an active (non-archived) Workflow with a published revision, creates the output Dataset in the same Workbook, and returns the connection with `outputDatasetId` — keep both ids. Add `--unfold-output-id <outputId>` to unfold (below).
+
+`connection archive` archives the connection and its output Dataset together, and returns the connection with `archivedAt` set. An archived connection refuses triggers, re-runs, and trigger policy changes; auto admission skips it; queued runs fail instead of starting; runs already executing still write their results. Its Dataset Entry Runs and output entries stay readable. Connections that read the archived output Dataset stop triggering too. Archiving again is a no-op, and there is no unarchive.
 
 ### Input mappings
 
@@ -180,8 +183,8 @@ Each successful run upserts output entries keyed to its input entry: re-running 
 
 ## Limits and workarounds
 
-- A connection's mapping, unfold config, and output label cannot be edited, and connections cannot be deleted. To change a mapping: create a new connection on the same input Dataset (allowed — one Dataset can feed many connections), which creates a fresh output Dataset; leave the old connection on `manual` and it stays inert.
-- The CLI cannot rename or unarchive a Dataset; a Dataset can be hard-deleted only while no connection references it.
+- A connection's mapping, unfold config, and output label cannot be edited, and connections cannot be deleted or unarchived. To change a mapping: create a new connection on the same input Dataset (allowed — one Dataset can feed many connections), which creates a fresh output Dataset; then `connection archive` the old one. Archiving the old connection archives its output Dataset, so first check `workbook inspect` for connections whose input is that output: each one stops triggering and needs a replacement connection reading the new output Dataset.
+- The CLI cannot rename or unarchive a Dataset; a Dataset can be hard-deleted only while no connection, archived or not, references it.
 - No CSV export; read output entries with `dataset entry list`.
 - An input Dataset may feed many connections, and a connection never crosses Workbooks.
 - Archived Workbooks/Datasets refuse ingestion and triggers; archiving a Workbook starts asynchronous Signal cleanup, and unarchiving does not recreate its Signals.
