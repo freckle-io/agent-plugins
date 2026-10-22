@@ -34,7 +34,7 @@ freckle org list --token <frk_token>
 freckle org list --json
 ```
 
-`org list` prints an `organizations` list of `orgId` and `name`.
+`org list` prints an `organizations` list of `orgId`, `name`, and `timeZone` (the Customer Timezone that cron Rerun Policies use; `null` means UTC).
 
 If exactly one organization is available, use it without asking. Otherwise, ask the user to choose from the full list. After automatic resolution or user selection, append `--org-id=<org-id>` after the complete subcommand path of every subsequent CLI command — for example, `freckle config path --org-id=<org-id>`.
 
