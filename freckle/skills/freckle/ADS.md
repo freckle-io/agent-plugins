@@ -5,7 +5,16 @@ An Ad Audience Sync pushes the Dataset Entries of one Dataset to one audience in
 - Meta and Google only add people. Deleting a Dataset Entry does not remove anyone from the audience.
 - LinkedIn replaces its whole list each run, once LinkedIn has finished building the previous upload. A run that finds LinkedIn still building is skipped, and the next scheduled run tries again.
 
-Pushing costs no Freckle credits. A sync does not find emails: when the Dataset lacks them, add a Workflow that finds them (for example a hashed email waterfall), run it, and point the sync at its output Dataset.
+Pushing costs no Freckle credits. Match rate is the whole game, and a sync only pushes what the Dataset already has.
+
+## Default path: raise match rate first
+
+Read this before building anything for an ads request, new Workbook or existing. Do it by default; the user may opt out but never has to ask for it.
+
+1. **Reuse the account's hashed email Workflow.** `workflow saved list --org-id=<org-id>` and look for one whose name or nodes mention hashed email (the prebuilt one is usually *Hashed email waterfall*). Build a new one only when none exists, following [waterfall.md](workflow/waterfall.md) with the `*-find-hashed-email` providers.
+2. **Propose it in the one round below**, even when the list already has an email column: fill the gaps (find LinkedIn profiles, then emails, for rows missing them) and add hashed emails, with the [credit cost](workflow/credit-cost.md) for this row count. Recommend yes; "push it as-is" is the opt-out.
+3. **Insert, don't duplicate.** In an existing Workbook, connect the hashed email Workflow to the list's Dataset; never create a second copy of the list. Connecting runs nothing: run the existing rows ([WORKBOOKS.md#pending-and-triggering](WORKBOOKS.md#pending-and-triggering)) and wait with `workflow saved runs watch` until they finish, then point the sync at its output Dataset.
+4. **Swap a live sync, don't delete it.** A sync's Dataset cannot be changed, and `ads create` always makes a new platform audience. Create the hashed sync, then `ads off` the one reading the raw list (never `ads delete`; the old audience stays intact), and tell the user to switch their campaigns to the new audience.
 
 ## Pick the connection and fields
 
@@ -29,8 +38,9 @@ Map `--company-path` to the company name, never its address. LinkedIn takes at m
 
 ## One round, then create
 
-A sync gets exactly one [batch grill](SKILL.md#shared-operating-rules) round before `ads create`. Lead with the [what-will-run summary](SKILL.md#shared-operating-rules), for example: "Every day Freckle pushes the 1,240 people in *Hashed contacts* to a new Meta Ads audience, *Q4 ICP*, in the Acme ad account. Pushing is free." Then number each unsettled decision with a recommendation:
+A sync gets exactly one [batch grill](SKILL.md#shared-operating-rules) round before `ads create`. Lead with the [what-will-run summary](SKILL.md#shared-operating-rules), for example: "Freckle fills missing emails and hashes all 1,240 people in *Q4 list* (about N credits), then every day pushes them to a new Meta Ads audience, *Q4 ICP*, in the Acme ad account. Pushing is free." Then number each unsettled decision with a recommendation:
 
+- Fill the gaps and add hashed emails first, with the credit cost (recommend yes).
 - Which connection, when more than one qualifies.
 - The audience name (recommend one from the user's goal).
 - Every 24 or 48 hours (recommend 24).

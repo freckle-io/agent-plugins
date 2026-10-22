@@ -22,7 +22,7 @@ This is a router skill: pick one primary route below and load adjunct references
 | Workbook housekeeping that changes nothing about what runs — inspect, archive, delete entries, rotate webhook secrets | [WORKBOOKS.md](WORKBOOKS.md) |
 | Return a Dataset webhook endpoint URL | [WORKBOOKS.md](WORKBOOKS.md) |
 | Create, inspect, list, turn monitoring on or off, or delete Dataset Signals | [SIGNALS.md](SIGNALS.md) |
-| Push a Dataset to a LinkedIn Ads, Meta Ads, or Google Ads audience, or inspect, turn on or off, reschedule, run, or delete Ad Audience Syncs | [ADS.md](ADS.md) |
+| Push a Dataset to a LinkedIn Ads, Meta Ads, or Google Ads audience — read before BUILD or REFINE, even for an existing Workbook — or inspect, turn on or off, reschedule, run, or delete Ad Audience Syncs | [ADS.md](ADS.md) |
 | Check the current credit balance or report credit usage by Workbook, Workflow, or billed node | [CREDITS.md](CREDITS.md) |
 | Log in, check auth, choose org, inspect endpoints | [SETUP.md](SETUP.md) |
 | Connect Apify, ContactOut, Google Ads, HeyReach, HubSpot, Instantly, Lemlist, LinkedIn Ads, Meta Ads, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |

@@ -132,12 +132,15 @@ freckle workbook dataset connection run <workbook-id> <connection-id> <entry-id>
 freckle workbook dataset connection rerun-failed <workbook-id> <connection-id>
 freckle workbook dataset connection runs <workbook-id> <connection-id> --limit 25
 freckle workbook dataset connection set-trigger-policy <workbook-id> <connection-id> --trigger-policy auto
+freckle workbook dataset connection set-rerun-policy <workbook-id> <connection-id> --interval-days 7 --stop-output-id converted
+freckle workbook dataset connection set-rerun-policy <workbook-id> <connection-id> --cron "0 9 * * 1"
+freckle workbook dataset connection clear-rerun-policy <workbook-id> <connection-id>
 freckle workbook dataset connection archive <workbook-id> <connection-id>
 ```
 
-`connection create` requires an active (non-archived) Workflow with a published revision, creates the output Dataset in the same Workbook, and returns the connection with `outputDatasetId` — keep both ids. Add `--unfold-output-id <outputId>` to unfold (below).
+`connection create` requires an active (non-archived) Workflow with a published revision, creates the output Dataset in the same Workbook, and returns the connection with `outputDatasetId` — keep both ids. Add `--unfold-output-id <outputId>` to unfold (below). With `--trigger-policy auto`, the `set-rerun-policy` flags (`--interval-days` or `--cron`, and `--stop-output-id`) give it a Rerun Policy (below) from the start.
 
-`connection archive` archives the connection and its output Dataset together, and returns the connection with `archivedAt` set. An archived connection refuses triggers, re-runs, and trigger policy changes; auto admission skips it; queued runs fail instead of starting; runs already executing still write their results. Its Dataset Entry Runs and output entries stay readable. Connections that read the archived output Dataset stop triggering too. Archiving again is a no-op, and there is no unarchive.
+`connection archive` archives the connection and its output Dataset together, and returns the connection with `archivedAt` set. An archived connection refuses triggers, re-runs, and trigger and rerun policy changes; auto admission skips it; queued runs fail instead of starting; runs already executing still write their results. Its Dataset Entry Runs and output entries stay readable. Connections that read the archived output Dataset stop triggering too. Archiving again is a no-op, and there is no unarchive.
 
 ### Input mappings
 
@@ -159,6 +162,7 @@ An entry is **pending** for a connection when its current version has no recorde
 - A manual `trigger` admits pending entries oldest-first (by entry creation), at most 1,000 per call (`--limit 1..1000` to admit fewer, e.g. a sample of the first rows). Loop until `startedCount` is 0 to drain a large Dataset.
 - `--trigger-policy auto` starts runs as entries become pending. Switching a connection to auto does **not** catch up already-pending entries — trigger manually first, then flip.
 - Failed runs never retry automatically. `rerun-failed` re-runs failed current-version entries, reusing their ledger records (no retry history).
+- A **Rerun Policy** reruns each entry on a schedule after its last successful run, to keep results fresh (re-enrich a lead weekly). Only auto connections take one; `set-trigger-policy manual` clears it, and switching back to auto does not restore it. Give exactly one schedule: `--interval-days 1..365` counts from when the run completed; `--cron` takes an expression with exactly one minute and one hour (at most daily), read in the Workspace's Customer Timezone (UTC when unset). `--stop-output-id` names a required boolean Workflow output: an entry reruns only while its run outputs `false`; anything else stops it. A changed policy applies after each entry's next run; already scheduled reruns keep their times, and after `clear-rerun-policy` they are dropped when they fall due. A rerun is skipped when the entry changed since (the new version runs as pending) or is already running; a failed run schedules nothing.
 - `runs` pages the ledger: each record binds one input entry version to one Workflow run, with status (`running`/`completed`/`failed`/`discarded`) and failure detail.
 
 ### Explicit entry runs

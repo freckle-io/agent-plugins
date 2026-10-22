@@ -1,6 +1,6 @@
 # Credits and Usage
 
-Use this route when the user asks for a credit balance, spend, usage, or an enrichment breakdown. Use the `credit` commands for general balance, historical or scoped usage, and enrichment breakdowns. Use Workflow Run inspection for a recent bounded set of known Run IDs; [sample credit evidence](#sample-credit-evidence) owns that split. Planning maximums and sample forecasts live in [credit-cost.md](workflow/credit-cost.md).
+Use this route when the user asks for a credit balance, spend, usage, or an enrichment breakdown. Use the `credit` commands for general balance, historical or scoped usage, and enrichment breakdowns. Use the `workflow saved runs watch` credit summary for a recent bounded set of known Run IDs; [sample credit evidence](#sample-credit-evidence) owns that split. Planning maximums and sample forecasts live in [credit-cost.md](workflow/credit-cost.md).
 
 ## Commands
 
@@ -40,11 +40,15 @@ Convert with `credits × planPriceUsdCents ÷ planCredits ÷ 100`. Quote dollars
 
 ## Sample credit evidence
 
-A recent bounded sample uses exact Workflow Run evidence. Keep the exact admitted Run IDs; watch them with `freckle workflow saved runs watch <workflow-id> <run-id>...` until every selected run reaches a terminal state, then inspect each one with `freckle workflow saved runs inspect <workflow-id> <run-id>`. For a Workbook connection, keep the `workflowRunId` values printed by `workbook dataset connection run`; for direct saved-Workflow invocations, keep each returned `runId`.
+A recent bounded sample uses exact Workflow Run evidence. Keep the exact admitted Run IDs: for a Workbook connection, the `workflowRunId` values printed by `workbook dataset connection run`; for direct saved-Workflow invocations, each returned `runId`. Pass them all to one watch:
 
-Sum the exact decimal-string `creditsConsumed` across every selected run, including failed terminal runs, and call that total **actual sample credits**. Complete per-run evidence is isolated by construction, so unrelated activity cannot distort it. Report that total immediately even when aggregate usage has not recorded the runs yet.
+```bash
+freckle workflow saved runs watch <workflow-id> <run-id>...
+```
 
-The aggregate `credit` reports remain the source for general usage information, historical or wider scopes, and node/category breakdowns. They are a sample fallback only when an exact sample Run ID or its `creditsConsumed` is unavailable. For that fallback, capture the narrowest report for the same UTC date before admission. After every sample run is terminal, capture that report again, then subtract the baseline `creditsConsumed` from the final value. In a `workflow-usage` response, compare the matching item in `workflows`, not the all-Workflow top-level total. Use:
+When every selected run is terminal, the watch prints each Run's `creditsConsumed`, their exact total and average per Run, and the plan rate, with dollar equivalents beside each amount. Failed runs count toward the total and still print the summary. The printed total is **actual sample credits**; report it and the average exactly as printed. Complete per-run evidence is isolated by construction, so unrelated activity cannot distort it, and it is available immediately even when aggregate usage has not recorded the runs yet.
+
+The aggregate `credit` reports remain the source for general usage information, historical or wider scopes, and node/category breakdowns. They are a sample fallback only when an exact sample Run ID is unavailable or the watch summary prints `Credits unavailable`. For that fallback, capture the narrowest report for the same UTC date before admission. After every sample run is terminal, capture that report again, then subtract the baseline `creditsConsumed` from the final value. In a `workflow-usage` response, compare the matching item in `workflows`, not the all-Workflow top-level total. Use:
 
 - `workbook-node-usage` for a sample whose full cost stays in one Workbook;
 - `workflow-usage` when isolating one Workflow inside a Workbook; or
@@ -56,6 +60,6 @@ Call the aggregate delta **actual sample credits** only when no unrelated work u
 
 - [ ] A general balance or usage request ran the narrowest `credit` report for the resolved org; every usage result was presented with its inclusive `from` and `to` dates.
 - [ ] Exact strings and enrichment semantics were preserved.
-- [ ] A recent bounded sample with complete Run evidence used the sum of its terminal Runs' `creditsConsumed` immediately.
+- [ ] A recent bounded sample with complete Run evidence reported the total and average its `runs watch` summary printed.
 - [ ] Aggregate totals were attributed to a sample only when before/after snapshots and scope isolation made that attribution trustworthy.
 - [ ] Every dollar amount shown came from the response's `creditPricing` rate with its source named; where the response omitted `creditPricing`, credits were reported alone with the unavailability stated once.

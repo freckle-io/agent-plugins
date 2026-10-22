@@ -52,11 +52,13 @@ After the first 10 input rows’ runs reach terminal states, return this heading
 
 **Credit Forecast Summary**
 
-An observed forecast requires actual sample credits for those 10 rows. Follow [CREDITS.md](../CREDITS.md#sample-credit-evidence): keep their exact Workflow Run IDs, wait until every selected run reaches a terminal state, then inspect and sum their exact `creditsConsumed`. Report:
+When the Credit Cost Summary's maximum is 0 credits per row, the sample cannot spend credits: the summary is one line saying the sample and the remaining rows use 0 credits.
 
-- sample size and actual sample credits;
-- average credits per row (`sample credits ÷ 10`); and
-- for a fixed Dataset, forecast total credits (`average credits per row × row count`).
+Otherwise an observed forecast requires actual sample credits for those 10 rows, read from the `runs watch` credit summary in [CREDITS.md](../CREDITS.md#sample-credit-evidence). Report:
+
+- sample size and actual sample credits (the summary's total);
+- average credits per row (the summary's average per Run); and
+- for a fixed Dataset, forecast total credits (`actual sample credits × row count ÷ sample size`), rounding only the final result rather than multiplying the summary's rounded average.
 
 Label this as a sample-based forecast, not a guarantee. Use the per-run total as the observed-spend source; outputs, selected branches, catalog maximums, and a zero lower bound remain planning context.
 
@@ -64,6 +66,6 @@ When exact Run evidence is unavailable, apply the aggregate fallback in `CREDITS
 
 ## Dollar equivalents
 
-Before producing each summary, acquire the user's plan-specific credit-to-dollar rate: run `freckle credit current --json` for the resolved org and use that response's `creditPricing` for that summary. Read its fields, conversion, source labels, and absent-rate rule in [CREDITS.md](../CREDITS.md#plan-rate-and-dollar-equivalents). Show dollars beside every credit amount at that rate, name the rate and its source (current plan or default rate), and show a total-workbook dollar figure only for a fixed Dataset size. When the response omitted `creditPricing`, that summary stays credits-only and says once that dollar equivalents are unavailable because the API did not report a plan rate.
+Before producing each summary, acquire the user's plan-specific credit-to-dollar rate: run `freckle credit current --json` for the resolved org and use that response's `creditPricing` for that summary. The Credit Forecast Summary instead uses the dollar amounts and rate its `runs watch` summary printed. Read its fields, conversion, source labels, and absent-rate rule in [CREDITS.md](../CREDITS.md#plan-rate-and-dollar-equivalents). Show dollars beside every credit amount at that rate, name the rate and its source (current plan or default rate), and show a total-workbook dollar figure only for a fixed Dataset size. When the response omitted `creditPricing`, that summary stays credits-only and says once that dollar equivalents are unavailable because the API did not report a plan rate.
 
 **Completion:** the plan has one **Credit Cost Summary** based on a verified maximum, an explicit uncapped formula, or an explicit post-run provider-usage calculation; after the first 10 input rows’ runs reach terminal states, one **Credit Forecast Summary** reports the exact per-run sample-credit total, a trustworthy aggregate fallback, or the explicit attribution limitation; credit-cost quantities use the label “credits,” each beside its dollar equivalent at the reported `creditPricing` rate with the source named, or credits-only with the stated unavailability when the response omitted `creditPricing`; no per-data-point credit allocation or unsupported range appears; and total dollars appear only for a fixed Dataset size.
