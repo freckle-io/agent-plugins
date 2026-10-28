@@ -38,6 +38,10 @@ Convert with `credits × planPriceUsdCents ÷ planCredits ÷ 100`. Quote dollars
 
 `creditPricing` is optional on the wire: an API deployment older than the CLI omits it, and human output then prints credits alone. When a response has no `creditPricing`, report credits only and say once that dollar equivalents are unavailable because the API did not report a plan rate. Do not substitute the default rate, and do not reuse a rate from another response.
 
+## Out of credits
+
+When the balance can't cover a run (`credit current` ≤ 0, an estimate above the balance, or an out-of-credits refusal), say so in one sentence with the `plansAndBillingUrl` from `credit current --json`, then offer to wait or shrink the run to fit. A personal credit limit goes to a Workspace admin, not Plans & billing.
+
 ## Sample credit evidence
 
 A recent bounded sample uses exact Workflow Run evidence. Keep the exact admitted Run IDs: for a Workbook connection, the `workflowRunId` values printed by `workbook dataset connection run`; for direct saved-Workflow invocations, each returned `runId`. Pass them all to one watch:

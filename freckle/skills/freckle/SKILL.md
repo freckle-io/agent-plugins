@@ -24,6 +24,7 @@ This is a router skill: pick one primary route below and load adjunct references
 | Create, inspect, list, turn monitoring on or off, or delete Dataset Signals | [SIGNALS.md](SIGNALS.md) |
 | Push a Dataset to a LinkedIn Ads, Meta Ads, or Google Ads audience — read before BUILD or REFINE, even for an existing Workbook — or inspect, turn on or off, reschedule, run, or delete Ad Audience Syncs | [ADS.md](ADS.md) |
 | Check the current credit balance or report credit usage by Workbook, Workflow, or billed node | [CREDITS.md](CREDITS.md) |
+| Out of credits, or a run costs more than the balance | [CREDITS.md#out-of-credits](CREDITS.md#out-of-credits) |
 | Log in, check auth, choose org, inspect endpoints | [SETUP.md](SETUP.md) |
 | Connect Apify, ContactOut, Google Ads, HeyReach, HubSpot, Instantly, Lemlist, LinkedIn Ads, Meta Ads, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |
 | Set up, list, or pick a credential so Workflows can use the user's own API key — match supported provider BYOK first, then custom HTTP APIs; a build or change request that mentions their own key still routes to BUILD or REFINE | [CONNECTIONS.md](CONNECTIONS.md) |

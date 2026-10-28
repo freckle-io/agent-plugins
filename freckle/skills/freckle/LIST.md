@@ -67,6 +67,7 @@ An immediate-action choice authorizes only the pinned create-only or create-and-
 - For Apollo and AI Ark, show the returned `totalEntries` and `estimatedCreditCost`. Use both returned values directly; do not recalculate them.
 - `totalEntries` is the provider's full matching total, independent of the requested limit, and can exceed the 50,000-entry import cap.
 - For AI Ark people, also show the requested import count as `requestedEntries`.
+- If `estimatedCreditCost` exceeds the balance, follow [Out of credits](CREDITS.md#out-of-credits).
 - Use `--raw` only when the complete provider preview records are explicitly needed.
 
 Preview is an iteration loop, not a one-shot gate. When the user reacts to a preview by asking for tweaks or better matches — "let's get more of these to be churches" — they are still on the preview path: apply the tweaks and run the revised preview in the same turn, showing the revised filters alongside the new entries. Creation and import are the only actions that wait for an explicit go-ahead.
