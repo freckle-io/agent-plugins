@@ -123,6 +123,8 @@ freckle workflow saved revisions inspect <workflowId> <revisionId>
 
 Each list row includes the Workflow's input/output `shape` when it has a published revision, and `saved inspect` embeds the full input/output `schema` — use these for reuse checks and input mappings instead of exporting drafts.
 
+Every Workflow also carries `managed`. `managed: true` marks a Freckle-managed Workflow: Freckle keeps it in sync with its library, so it can't be renamed, archived, or given new revisions. To change one, export its draft and save it as a new Workflow.
+
 `workflow saved list` adds `costEstimate` to every Workflow row, and `workflow saved inspect <workflowId>` adds it to the top-level response:
 
 ```yaml
