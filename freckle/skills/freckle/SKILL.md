@@ -19,6 +19,7 @@ This is a router skill: pick one primary route below and load adjunct references
 | Do anything to an existing Workbook or Workflow identified by URL, id, or name — add data, run rows, or change its setup | [REFINE.md](REFINE.md) |
 | Run an existing saved Workflow directly with JSON inputs, inspect runs, list saved Workflows | [workflow/cli-reference.md](workflow/cli-reference.md) |
 | Inspect node capabilities | [workflow/cli-reference.md#node-catalog](workflow/cli-reference.md#node-catalog) |
+| Run a Workflow on a schedule — the app's **Scheduled Workflows** ("every Monday", "keep it fresh", "daily", "on a cron", "make it automatic", "when the first finishes run the second"), or pause, change, or explain one. | [WORKBOOKS.md#scheduled-workflows](WORKBOOKS.md#scheduled-workflows) |
 | Workbook housekeeping that changes nothing about what runs — inspect, archive, delete entries, rotate webhook secrets | [WORKBOOKS.md](WORKBOOKS.md) |
 | Return a Dataset webhook endpoint URL | [WORKBOOKS.md](WORKBOOKS.md) |
 | Create, inspect, list, turn monitoring on or off, or delete Dataset Signals | [SIGNALS.md](SIGNALS.md) |

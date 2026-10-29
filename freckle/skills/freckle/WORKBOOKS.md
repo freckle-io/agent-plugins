@@ -165,6 +165,15 @@ An entry is **pending** for a connection when its current version has no recorde
 - A **Rerun Policy** reruns each entry on a schedule after its last successful run, to keep results fresh (re-enrich a lead weekly). Only auto connections take one; `set-trigger-policy manual` clears it, and switching back to auto does not restore it. Give exactly one schedule: `--interval-days 1..365` counts from when the run completed; `--cron` takes an expression with exactly one minute and one hour (at most daily), read in the Workspace's Customer Timezone (UTC when unset; `org list` shows it as `timeZone`, and `org set-time-zone <iana-zone> --org-id=<org-id>` changes it, `UTC` included, keeping reruns already scheduled at their times). `--stop-output-id` names a required boolean Workflow output: an entry reruns only while its run outputs `false`; anything else stops it. A changed policy applies after each entry's next run; already scheduled reruns keep their times, and after `clear-rerun-policy` they are dropped when they fall due. A rerun is skipped when the entry changed since (the new version runs as pending) or is already running; a failed run schedules nothing.
 - `runs` pages the ledger: each record binds one input entry version to one Workflow run, with status (`running`/`completed`/`failed`/`discarded`) and failure detail.
 
+### Scheduled Workflows
+
+When you set, change, pause or explain one, call it a **Scheduled Workflow** in your reply (the app's name: "I set up a Scheduled Workflow that…"); "Rerun Policy" is only the command name.
+- "Every Monday morning", "at 7am", "on a cron" → `--cron` (ask the time if none is given, and read it in the Workspace zone from `org list`); "weekly", "every few days", "keep it fresh" → `--interval-days`. Pass `--trigger-policy auto` first if the connection is manual — "make it automatic" means new rows run on their own; ask whether existing rows should also rerun on a schedule.
+- Stop conditions are per row: `--stop-output-id` stops a row once its boolean output is true (e.g. an email was found). There is no stop after N rows or a total, and no schedule more often than daily; say so and offer the nearest that works.
+- "Pause" is `clear-rerun-policy` (new rows keep running). Setting it again does not restore reruns that fell due while paused; those rows restart only after another successful run. Editing is `set-rerun-policy` again.
+- "When the first finishes run the second" is chaining, not a schedule: connect the second Workflow to the first connection's output Dataset with `--trigger-policy auto`.
+- Tell the user it starts after each row's next successful run, and in which time zone a cron fires. Switching to auto runs only rows added after the switch; starting existing rows needs a separate run. Ask the user before any run or switch.
+
 ### Explicit entry runs
 
 `connection run` sends one ordered batch of 1–1,000 unique Dataset Entry ids. The entries must be current members of the connection's input Dataset; local argument errors make no request. The response preserves one result per requested id in the same order:
