@@ -46,7 +46,7 @@ Entry deletion is asynchronous and also deletes downstream entries derived throu
 For CSV ingestion, choose the destination first and read the matching help for inputs, limits, key behavior, and failure handling:
 
 - Existing Dataset: `freckle workbook dataset csv import --help`.
-- New Dataset in an existing Workbook: `freckle workbook dataset build new csv --help`.
+- New Dataset in an existing Workbook: `freckle workbook dataset csv create --help`.
 
 ## Sources and keys
 

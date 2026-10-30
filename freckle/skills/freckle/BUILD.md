@@ -11,11 +11,11 @@ Exact sequence for a CSV into a **new** Workbook:
 ```bash
 freckle org list                          # exactly one org → use it silently; else ask in the same batched round
 FRECKLE_ORG_ID=<org-id> freckle workbook create --label "<label>" --description "<one-liner>"
-FRECKLE_ORG_ID=<org-id> freckle workbook dataset build new csv <workbook-id> /abs/path/rows.csv --label "<label>" --key-column <key>
+FRECKLE_ORG_ID=<org-id> freckle workbook dataset csv create <workbook-id> /abs/path/rows.csv --label "<label>" --key-column <key>
 FRECKLE_ORG_ID=<org-id> freckle workbook dataset entry list <workbook-id> <dataset-id> --limit 5   # verify rows landed
 ```
 
-`build new csv` creates the Dataset and imports in one command, and deletes the Dataset again if the import fails. (Importing into an **existing** Dataset is [REFINE.md](REFINE.md) territory; the command it uses is `freckle workbook dataset csv import <workbook-id> <dataset-id> --file /abs/path/rows.csv --key-column <key>`.) Always pass a `--key-column` that uniquely identifies a row (re-imports then update instead of duplicating). Report the workbook id, dataset id, and row count, and stop — no workflow work. The moment the request grows beyond ingestion (enrich, run, connect a workflow), leave this lane and enter the gated path below.
+`csv create` creates the Dataset and imports in one command. If the import fails, the Dataset is kept and the error says how to delete it. (Importing into an **existing** Dataset is [REFINE.md](REFINE.md) territory; the command it uses is `freckle workbook dataset csv import <workbook-id> <dataset-id> /abs/path/rows.csv --key-column <key>`.) Always pass a `--key-column` that uniquely identifies a row (re-imports then update instead of duplicating). Report the workbook id, dataset id, and row count, and stop — no workflow work. The moment the request grows beyond ingestion (enrich, run, connect a workflow), leave this lane and enter the gated path below.
 
 ## The Gated Build Path
 
