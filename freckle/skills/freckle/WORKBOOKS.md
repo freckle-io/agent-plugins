@@ -43,6 +43,8 @@ freckle workbook dataset entry delete <workbook-id> <dataset-id> <entry-id...>
 
 Entry deletion is asynchronous and also deletes downstream entries derived through workflow lineage.
 
+Only CSV-upload or manual Datasets accept `entry create` and `entry update`; provider-fed Datasets (Apollo or AI Ark company/people search, CRM, webhook, Signal, Workflow output) only take rows from their source. To change an Apollo or AI Ark list, build it again with changed filters (`freckle list build apollo --help` or `freckle list build ai-ark --help`); for a fully hand-curated table, use `freckle workbook dataset csv create`.
+
 For CSV ingestion, choose the destination first and read the matching help for inputs, limits, key behavior, and failure handling:
 
 - Existing Dataset: `freckle workbook dataset csv import --help`.
@@ -59,12 +61,13 @@ freckle workbook dataset hubspot inspect <workbook-id> <source-id>
 freckle workbook dataset hubspot fetch-next-batch <workbook-id> <source-id> --request-id <stable-request-id>
 ```
 
-Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
+Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `datamoon`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
 
 - CSV: choose a stable `--key-column` when repeated imports should update the same logical records.
 - Webhook: key is the value at `--key-path` (JSON Pointer) in each posted record; must be a non-empty scalar.
 - HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
 - Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset, except in a `--mirror` list-view source, which requests deletion for records that left the list view.
+- Competitor website tracking (`datamoon`): key is the visitor's contact id, so a person who visits on several days stays one entry. Entries stay in the Dataset after tracking stops.
 - Manual entries: keyed by their own id; `entry update` replaces the value and bumps the version.
 - Workflow node entries: written by Push to Dataset through one reused `workflow_node` source per Dataset; their keys identify the producing Workflow Run, node, and array index. Repeating the same run/node/index reuses the entry; a separate run has distinct keys. See [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
 
@@ -106,6 +109,23 @@ Read the selected command's `--help` before composing any `salesforce` command. 
 - **Custom SOQL preview gate:** write the SOQL to an absolute file and run `salesforce soql preview` on that exact file until it exits 0 and the object, fields, and rows match the goal; only then run `salesforce create --soql-file` with the same file. Zero rows is a valid preview: tell the user it matched nothing and adjust the filters when that misses the goal.
 - Give each create and fetch-next-batch its own stable `--request-id`, and reuse an ID only to retry that same operation.
 - Before relying on an import's entries, wait for it as `salesforce fetch-next-batch --help` describes: a scheduled source returns a null `run`.
+
+### Competitor website tracking
+
+Read the selected command's `--help` before composing any `datamoon` command. Help owns syntax, examples, constraints, and output shapes.
+
+| Goal | Command |
+| --- | --- |
+| Collect the companies and people visiting competitor websites into a new Dataset, imported daily | `freckle workbook dataset datamoon create` |
+| Check the tracked domains, visitor filters, credits charged, and the import schedule | `freckle workbook dataset datamoon inspect` |
+| Change which visitors are imported, such as only senior people or only certain countries | `freckle workbook dataset datamoon update-filters` |
+| Import visitors now instead of at the daily time | `freckle workbook dataset datamoon fetch-next-batch` |
+| Stop tracking | `freckle workbook dataset datamoon delete` |
+
+- `datamoon create` always creates a new Dataset and charges 1 credit per distinct domain the moment tracking starts. State the domains and that cost, and get the user's approval before running it.
+- Track only domains the user named. `www.` is ignored, but every other subdomain is its own domain and its own credit.
+- Visitor filters (`--filters-json`) narrow which visitors each import keeps, by job title, seniority, department, location, company size, industry and similar profile fields. Seniority, job level, department, job function, persona, employee range and revenue range take only the values listed in `--help`; countries are two-letter codes such as `US`. Changing filters costs nothing; the next import covers the whole lookback again with the new filters, and visitors already imported stay.
+- `datamoon delete` refunds nothing, and tracking the same domains again charges them again; confirm with the user before deleting.
 
 ## Field catalogs
 

@@ -1,6 +1,6 @@
 ---
 name: freckle
-description: "Use when the user asks to use the Freckle CLI or get Freckle to do something: enrich/score/process a lead list, build a company or people list, import CRM records, monitor Dataset Signals, push Datasets to LinkedIn, Meta, or Google Ads audiences, build or change Workbooks, datasets, or Workflows, publish or run saved workflows, inspect credit usage or node capabilities, auth/org/config setup, or integration connections."
+description: "Use when the user asks to use the Freckle CLI or get Freckle to do something: enrich/score/process a lead list, build a company or people list, import CRM records, track competitor website visitors, monitor Dataset Signals, push Datasets to LinkedIn, Meta, or Google Ads audiences, build or change Workbooks, datasets, or Workflows, publish or run saved workflows, inspect credit usage or node capabilities, auth/org/config setup, or integration connections."
 ---
 
 # Freckle
@@ -23,6 +23,7 @@ This is a router skill: pick one primary route below and load adjunct references
 | Workbook housekeeping that changes nothing about what runs — inspect, archive, delete entries, rotate webhook secrets | [WORKBOOKS.md](WORKBOOKS.md) |
 | Return a Dataset webhook endpoint URL | [WORKBOOKS.md](WORKBOOKS.md) |
 | Create, inspect, list, turn monitoring on or off, or delete Dataset Signals | [SIGNALS.md](SIGNALS.md) |
+| Track who visits competitor websites — start, filter, inspect, import now, or stop | [WORKBOOKS.md#competitor-website-tracking](WORKBOOKS.md#competitor-website-tracking) |
 | Push a Dataset to a LinkedIn Ads, Meta Ads, or Google Ads audience — read before BUILD or REFINE, even for an existing Workbook — or inspect, turn on or off, reschedule, run, or delete Ad Audience Syncs | [ADS.md](ADS.md) |
 | Check the current credit balance or report credit usage by Workbook, Workflow, or billed node | [CREDITS.md](CREDITS.md) |
 | Out of credits, or a run costs more than the balance | [CREDITS.md#out-of-credits](CREDITS.md#out-of-credits) |
