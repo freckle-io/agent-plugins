@@ -28,7 +28,7 @@ This is a router skill: pick one primary route below and load adjunct references
 | Check the current credit balance or report credit usage by Workbook, Workflow, or billed node | [CREDITS.md](CREDITS.md) |
 | Out of credits, or a run costs more than the balance | [CREDITS.md#out-of-credits](CREDITS.md#out-of-credits) |
 | Log in, check auth, choose org, inspect endpoints | [SETUP.md](SETUP.md) |
-| Connect Apify, ContactOut, Google Ads, HeyReach, HubSpot, Instantly, Lemlist, LinkedIn Ads, Meta Ads, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |
+| Connect Apify, Attio, ContactOut, Google Ads, HeyReach, HubSpot, Instantly, Lemlist, LinkedIn Ads, Meta Ads, OpenAI, Salesforce, Slack, Supabase, or Twain, or find credential IDs | [CONNECTIONS.md](CONNECTIONS.md) |
 | Set up, list, or pick a credential so Workflows can use the user's own API key — match supported provider BYOK first, then custom HTTP APIs; a build or change request that mentions their own key still routes to BUILD or REFINE | [CONNECTIONS.md](CONNECTIONS.md) |
 | Understand enrichment waterfalls, collectors, or Research Agent usage | [workflow/waterfall.md](workflow/waterfall.md), [workflow/collector.md](workflow/collector.md), [workflow/research-agent.md](workflow/research-agent.md) |
 | Explain what Freckle can currently do — a capability question only, with no task attached | [WHAT-CAN-FRECKLE-DO.md](WHAT-CAN-FRECKLE-DO.md) |
