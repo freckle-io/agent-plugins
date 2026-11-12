@@ -69,6 +69,21 @@ nodes:
 
 Node config values must be `null`, strings, booleans, finite numbers, dense arrays, or plain objects with own enumerable string data properties. Config object keys belong to the node definition and do not have to be Workflow Draft Identifiers.
 
+### Embedding a saved Workflow
+
+A `workflow@1.0.0` node runs a saved revision of another Workflow in the same workspace as one step. Use it to reuse a Freckle-managed Workflow (or any saved one) instead of copying its nodes — for example, find a LinkedIn URL, then embed the managed email and phone Workflows. `workflow node list` gives each managed Workflow's `embed` block; paste its `uses` and `config`:
+
+```yaml
+nodes:
+  findWorkEmail:
+    uses: workflow@1.0.0
+    config: { workflow: <workflowKey>, revision: <revisionNumber> }
+    with:
+      linkedInUrl: $nodes.findLinkedIn.linkedInUrl
+```
+
+The node's input ports are that revision's Workflow Inputs and its outputs are that revision's Workflow Outputs; run `workflow node preview <nodeId> --file <draft.yaml>` on the draft to see them. The embedded revision runs as its own child Workflow Run, which charges for its own nodes.
+
 ## Endpoint References
 
 Workflow Draft Endpoint References name sources only:

@@ -30,6 +30,8 @@ nodes:
     creditCostModel: <static-or-dynamic-or-usage_based>
 ```
 
+With an active org, the list starts with `managedWorkflows`: the workspace's Freckle-managed Workflows. Each one that has a Workflow key and a saved revision carries an `embed` block (`uses: workflow@1.0.0` and its `config`) for running it as a step of a new Workflow; see [draft-syntax.md](draft-syntax.md#embedding-a-saved-workflow). Embed or chain them instead of rebuilding what they do.
+
 `description` and `purpose` are omitted when unavailable.
 `creditCost` and `creditCostModel` are always present, including when the price is zero. `creditCost` is the customer-facing unit price for `static` and `dynamic` models. A `static` price is charged at most once per execution and only when the node produces a billable result; an enrichment node that finds no result costs 0 credits. A `dynamic` price is charged once per billable result. For `usage_based`, the listed `creditCost` is a placeholder rather than a quote: the exact Freckle-credit charge is calculated from metered provider usage after execution.
 
