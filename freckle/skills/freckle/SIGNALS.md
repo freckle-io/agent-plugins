@@ -26,6 +26,10 @@ The CLI create command supports these Signal types:
 
 - `contact_job_changes` - Monitor contact job changes
 
+**Industry**
+
+- `industry_funding_rounds` - Monitor for new funding round events
+
 Both company types require `--company-domain-path`; `--company-profile-url-path` is optional. They also accept repeatable `--department`, repeatable `--seniority`, and repeatable `--job-titles`:
 
 ```bash
@@ -70,12 +74,23 @@ freckle signals create <input-dataset-id> <output-dataset-id> \
 
 When the input Dataset lacks a LinkedIn profile URL column, add an enrichment step to the Workbook's Workflow that populates it, run that enrichment, and only then create the Signal. Entries whose profile URL is still blank at provisioning time fail as source-data exceptions instead of being monitored.
 
+Funding-round monitoring watches newly announced rounds across every company, not just companies in the input Dataset. Each input Dataset Entry becomes one monitor: `--keyword-path` (optional, at least three characters) narrows that monitor to rounds matching the Entry's keyword, and repeatable `--country` (ISO alpha-2, up to five) narrows every monitor by country. Without `--keyword-path`, every Entry creates an identical unfiltered monitor and each one bills its own findings, so use an input Dataset with exactly one Entry in that case:
+
+```bash
+freckle signals create <input-dataset-id> <output-dataset-id> \
+  --signal-type industry_funding_rounds \
+  --keyword-path /keyword \
+  --country US \
+  --country CA
+```
+
 ### One round, then create
 
 A Signal gets exactly one [batch grill](SKILL.md#shared-operating-rules) round before `signals create`. Lead the round with the [what-will-run summary](SKILL.md#shared-operating-rules) — here: what Freckle will watch, what counts as a finding, which filters narrow it, where findings land, and the per-finding credit cost from `signals list`. For example: "Freckle will watch the 340 companies in *Target Accounts* and add a row to *New Hires* each time one hires a Director-level Operations leader. 2 credits per finding." Below the summary, number every decision the request or an inspection has not already settled, with a recommended answer for each:
 
 - Which input and output Datasets, when more than one candidate fits.
 - For the company types: department, seniority, and job-title filters, or none.
+- For funding rounds: which keywords (one input Dataset Entry each) and which countries, or none.
 - For any Signal other than contact job changes, the lookback — always ask the user exactly: **“Include results from last 24 hours?”** This item carries no recommendation; the user decides it even when every other creation detail is known. Yes → pass `--include-last-24-hours`; no → omit it. The flag includes qualifying events from the 24 hours before each monitor was created; when provider submission occurs more than 24 hours later, the cutoff is limited to the rolling 24 hours before submission. Without the flag, only events after provider creation qualify. Initial findings can arrive asynchronously.
 
 The user's answers are the approval: create the Workbook, Datasets, and Signal on them in the same turn, restating the summary only where an answer changed it. Do not present a separate plan or ask for a second confirmation — this round is the plan gate. A second round happens only when an answer opened a decision that did not exist before.
