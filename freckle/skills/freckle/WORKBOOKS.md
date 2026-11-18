@@ -61,12 +61,13 @@ freckle workbook dataset hubspot inspect <workbook-id> <source-id>
 freckle workbook dataset hubspot fetch-next-batch <workbook-id> <source-id> --request-id <stable-request-id>
 ```
 
-Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `datamoon`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
+Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `attio`, `datamoon`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
 
 - CSV: choose a stable `--key-column` when repeated imports should update the same logical records.
 - Webhook: key is the value at `--key-path` (JSON Pointer) in each posted record; must be a non-empty scalar.
 - HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
 - Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset, except in a `--mirror` list-view source, which requests deletion for records that left the list view.
+- Attio: key identifies the Attio workspace, object, and record id; a later `attio sync` or scheduled import adds the records created in Attio since the last import without duplicating or touching existing ones. Records edited or deleted in Attio stay in the Dataset as they were imported.
 - Competitor website tracking (`datamoon`): key is the visitor's contact id, so a person who visits on several days stays one entry. Entries stay in the Dataset after tracking stops.
 - Manual entries: keyed by their own id; `entry update` replaces the value and bumps the version.
 - Workflow node entries: written by Push to Dataset through one reused `workflow_node` source per Dataset; their keys identify the producing Workflow Run, node, and array index. Repeating the same run/node/index reuses the entry; a separate run has distinct keys. See [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
@@ -109,6 +110,24 @@ Read the selected command's `--help` before composing any `salesforce` command. 
 - **Custom SOQL preview gate:** write the SOQL to an absolute file and run `salesforce soql preview` on that exact file until it exits 0 and the object, fields, and rows match the goal; only then run `salesforce create --soql-file` with the same file. Zero rows is a valid preview: tell the user it matched nothing and adjust the filters when that misses the goal.
 - Give each create and fetch-next-batch its own stable `--request-id`, and reuse an ID only to retry that same operation.
 - Before relying on an import's entries, wait for it as `salesforce fetch-next-batch --help` describes: a scheduled source returns a null `run`.
+
+### Manual and scheduled Attio imports
+
+Read the selected command's `--help` before composing any `attio` command. Help owns syntax, examples, selection, constraints, and output shapes.
+
+| Goal | Command |
+| --- | --- |
+| Find objects and attributes to import | `freckle workbook dataset attio objects` or `attributes` |
+| Import the records of one Attio object into a new Dataset, once or on a schedule | `freckle workbook dataset attio create` |
+| Check an import and its schedule | `freckle workbook dataset attio inspect` |
+| Import the records created in Attio since the last import | `freckle workbook dataset attio sync` |
+| Add, change, or delete a schedule | `freckle workbook dataset attio schedule set` or `schedule remove` |
+
+- `attio create` always creates a new Dataset. Get a connected credential ID with `freckle connections show attio --org-id <org-id>`.
+- Select records only as the user approved: every record of one object, or an Attio filter on it. Attio lists are not supported; say so instead of approximating them.
+- A schedule only adds records created in Attio since the last import. It never updates or removes existing entries, so say so when the user expects edits or deletions in Attio to follow; `attio sync` on a source with an enabled schedule runs that same add-only import now and returns a null `run`.
+- Give each create and sync its own stable `--request-id`, and reuse an ID only to retry that same operation.
+- Before relying on an import's entries, poll `attio inspect` until `latestRun.status` is `completed`; if it is `failed`, report `latestRun.error` and stop.
 
 ### Competitor website tracking
 
