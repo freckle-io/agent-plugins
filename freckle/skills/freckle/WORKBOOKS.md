@@ -61,13 +61,14 @@ freckle workbook dataset hubspot inspect <workbook-id> <source-id>
 freckle workbook dataset hubspot fetch-next-batch <workbook-id> <source-id> --request-id <stable-request-id>
 ```
 
-Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `attio`, `datamoon`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
+Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubspot`, `salesforce`, `attio`, `snowflake`, `datamoon`, `signal`, `apollo_company_search`, `apollo_people_search`, `ai_ark_company_search`, `ai_ark_people_search`, `workflow_output`, or `workflow_node` — and carries a **source key** that identifies its logical record within the Dataset. A Dataset is the entry container and may have multiple configured sources; each entry belongs to exactly one. Repeat-key behavior depends on the source:
 
 - CSV: choose a stable `--key-column` when repeated imports should update the same logical records.
 - Webhook: key is the value at `--key-path` (JSON Pointer) in each posted record; must be a non-empty scalar.
 - HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
 - Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset, except in a `--mirror` list-view source, which requests deletion for records that left the list view.
 - Attio: key identifies the Attio workspace, object, and record id; a later `attio sync` or scheduled import adds the records created in Attio since the last import without duplicating or touching existing ones. Records edited or deleted in Attio stay in the Dataset as they were imported.
+- Snowflake: choose a stable `--key-column` when repeated imports should update the same logical records; without one every row becomes a new entry. Rows that left the query's result remain in the Dataset.
 - Competitor website tracking (`datamoon`): key is the visitor's contact id, so a person who visits on several days stays one entry. Entries stay in the Dataset after tracking stops.
 - Manual entries: keyed by their own id; `entry update` replaces the value and bumps the version.
 - Workflow node entries: written by Push to Dataset through one reused `workflow_node` source per Dataset; their keys identify the producing Workflow Run, node, and array index. Repeating the same run/node/index reuses the entry; a separate run has distinct keys. See [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
@@ -128,6 +129,24 @@ Read the selected command's `--help` before composing any `attio` command. Help 
 - A schedule only adds records created in Attio since the last import. It never updates or removes existing entries, so say so when the user expects edits or deletions in Attio to follow; `attio sync` on a source with an enabled schedule runs that same add-only import now and returns a null `run`.
 - Give each create and sync its own stable `--request-id`, and reuse an ID only to retry that same operation.
 - Before relying on an import's entries, poll `attio inspect` until `latestRun.status` is `completed`; if it is `failed`, report `latestRun.error` and stop.
+
+### Snowflake imports
+
+Read the selected command's `--help` before composing any `snowflake` command. Help owns syntax, examples, constraints, and output shapes.
+
+| Goal | Command |
+| --- | --- |
+| Check a query and see sample rows before importing it | `freckle workbook dataset snowflake preview` |
+| Import a query's whole result into an existing Dataset, once | `freckle workbook dataset snowflake import` |
+
+- Get the Snowflake credential ID with `freckle connections show snowflake --org-id <org-id>`. The connection itself is created in Freckle's web app.
+- **Query preview gate:** write the query to an absolute file and run `snowflake preview` on that exact file until it exits 0 and the columns and rows match the goal; only then run `snowflake import` with the same file. Zero rows is a valid preview: tell the user it matched nothing.
+- The query runs on the customer's own Snowflake warehouse, at their cost. Select only the columns and rows the user approved; never guess a table.
+- `snowflake import` writes into an existing Dataset (create one with `workbook dataset create`), returns at once, and does not refresh later. Wait for it with `workbook dataset source list` until the source's `config.import.status` is `done` or `failed` before relying on its entries.
+
+- [ ] `snowflake preview` exited 0 on the query file, and its columns and sample rows were checked against what the user approved.
+- [ ] `snowflake import` ran with that same file, unchanged since the preview.
+- [ ] The import's source reached `config.import.status` `done`; on `failed`, its `config.import.error` was reported and no entries were relied on.
 
 ### Competitor website tracking
 

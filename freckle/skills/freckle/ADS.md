@@ -53,7 +53,7 @@ freckle ads create <dataset-id> --credential-id <credential-id> --audience-name 
 freckle ads create <dataset-id> --credential-id <credential-id> --audience-name "Q4 ICP" --email-path /hashedEmails --company-path /company --title-path /title --every 48h --org-id=<org-id>
 ```
 
-The Dataset must be active, in an active Workbook. The first push starts about a minute after creation.
+The Dataset must be active, in an active Workbook. The first push starts about a minute after creation. To set a sync up without starting it, add `--paused`; `ads on` starts it later.
 
 - [ ] The user's answers to the one batch grill round settled every numbered decision.
 - [ ] `ads create` exited 0, and its `sync` shows the chosen connection's `credentialId`, the audience name, and the schedule the user approved.

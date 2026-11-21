@@ -11,7 +11,7 @@ Use this template to describe Freckle and its current CLI capabilities.
 - Push object collections into same-Workbook Datasets during a workflow run, then chain other workflows from those entries.
 - Reuse what exists: list Workbooks with their wiring, list saved workflows with their input/output shapes, export editable drafts, publish new revisions, and update workflow metadata.
 - Run workflows on sample inputs: invoke a saved workflow with JSON object inputs and inspect asynchronous run results.
-- Manage Workbook datasets: list and create datasets, import CSV or selected HubSpot, Salesforce, or Attio records, inspect, rerun, or schedule those imports, manage entries and webhooks, and connect datasets to saved workflows.
+- Manage Workbook datasets: list and create datasets, import CSV, selected HubSpot, Salesforce, or Attio records, or the result of a Snowflake query, inspect, rerun, or schedule those imports, manage entries and webhooks, and connect datasets to saved workflows.
 - Monitor Dataset Entries for company job openings, company new hires, or contact job changes, route findings into an output Dataset, inspect asynchronous lifecycle progress, and request safe remote cleanup.
 - Connect integrations: open Freckle's web app to connect Apify, Attio, ContactOut, HeyReach, HubSpot, Instantly, Lemlist, OpenAI, Salesforce, Slack, or Supabase credentials, list connection status, and inspect public credential IDs.
 - Call any HTTP API with your own API key: save the key once in Freckle's web app, and workflows reference it by its saved credential ID — the key itself never appears in chat or workflow files.
