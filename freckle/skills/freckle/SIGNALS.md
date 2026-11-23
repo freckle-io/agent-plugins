@@ -39,12 +39,12 @@ freckle signals create <input-dataset-id> <output-dataset-id> \
 
 ### Company filter values
 
-`--department` and `--seniority` accept only these exact values; anything else fails at create time. A finding must match one value from each provided filter, so combining them narrows results.
+`--department` and `--seniority` accept only these exact values; anything else fails at create time. Without `--job-titles`, a finding must match one value from each provided filter, so combining department and seniority narrows results.
 
 - Departments: `Accounting`, `Administrative`, `Business Development`, `Consulting`, `Customer Success`, `Design`, `Education`, `Engineering`, `Finance`, `Human Resources`, `Information Technology`, `Leadership`, `Legal`, `Manufacturing`, `Marketing`, `Media and Communication`, `Operations`, `Product Management`, `Project Management`, `Purchasing`, `Quality Assurance`, `Real Estate`, `Research`, `Sales`, `Support`
 - Seniorities: `Owner`, `CXO`, `Vice President`, `Director`, `Manager`, `Senior`, `Entry`, `Training`, `Partner`
 
-The CLI sends every filter you supply, and each one narrows the match. Repeat the flag to match any of several titles; each plain title is quoted automatically and the values combine with OR:
+`--job-titles` takes precedence: once it is set, the Signal provider (TAMradar) matches on titles alone and ignores `--department` and `--seniority`. Leave those two flags out whenever you pass `--job-titles`, and put any level or department the user wants into the titles themselves (`"VP Sales"`, `"Head of Operations"`). Repeat the flag to match any of several titles; each plain title is quoted automatically and the values combine with OR:
 
 ```bash
 freckle signals create <input-dataset-id> <output-dataset-id> \
@@ -75,7 +75,7 @@ When the input Dataset lacks a LinkedIn profile URL column, add an enrichment st
 A Signal gets exactly one [batch grill](SKILL.md#shared-operating-rules) round before `signals create`. Lead the round with the [what-will-run summary](SKILL.md#shared-operating-rules) — here: what Freckle will watch, what counts as a finding, which filters narrow it, where findings land, and the per-finding credit cost from `signals list`. For example: "Freckle will watch the 340 companies in *Target Accounts* and add a row to *New Hires* each time one hires a Director-level Operations leader. 2 credits per finding." Below the summary, number every decision the request or an inspection has not already settled, with a recommended answer for each:
 
 - Which input and output Datasets, when more than one candidate fits.
-- For the company types: department, seniority, and job-title filters, or none.
+- For the company types: job titles, or department and seniority, or no filter. Job titles replace department and seniority rather than adding to them, so when the user asks for both, recommend job titles that carry the level and department, and tell the user that a department or seniority filter would be ignored alongside them.
 - For any Signal other than contact job changes, the lookback — always ask the user exactly: **“Include results from last 24 hours?”** This item carries no recommendation; the user decides it even when every other creation detail is known. Yes → pass `--include-last-24-hours`; no → omit it. The flag includes qualifying events from the 24 hours before each monitor was created; when provider submission occurs more than 24 hours later, the cutoff is limited to the rolling 24 hours before submission. Without the flag, only events after provider creation qualify. Initial findings can arrive asynchronously.
 
 The user's answers are the approval: create the Workbook, Datasets, and Signal on them in the same turn, restating the summary only where an answer changed it. Do not present a separate plan or ask for a second confirmation — this round is the plan gate. A second round happens only when an answer opened a decision that did not exist before.
