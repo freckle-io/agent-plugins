@@ -68,7 +68,7 @@ Every entry enters through a source — `manual`, `csv_upload`, `webhook`, `hubs
 - HubSpot: key identifies the portal, object type, and HubSpot object id; later HubSpot imports update the same logical records instead of duplicating them. Records no longer returned by HubSpot remain in the Dataset.
 - Salesforce: key identifies the Salesforce org, object type, and record id; later Salesforce imports update the same logical records instead of duplicating them. Records no longer returned by Salesforce remain in the Dataset, except in a `--mirror` list-view source, which requests deletion for records that left the list view.
 - Attio: key identifies the Attio workspace, object, and record id; a later `attio sync` or scheduled import adds the records created in Attio since the last import without duplicating or touching existing ones. Records edited or deleted in Attio stay in the Dataset as they were imported.
-- Snowflake: choose a stable `--key-column` when repeated imports should update the same logical records; without one every row becomes a new entry. Rows that left the query's result remain in the Dataset.
+- Snowflake: choose a stable `--key-column` when repeated imports should update the same logical records; without one every row becomes a new entry. Rows that left the query's result remain in the Dataset. A Snowflake mirror keeps its own keys, apart from every other source's: a refresh adds and requests deletion of only the entries that mirror wrote, and a row edited in Snowflake keeps the values it was added with.
 - Competitor website tracking (`datamoon`): key is the visitor's contact id, so a person who visits on several days stays one entry. Entries stay in the Dataset after tracking stops.
 - Manual entries: keyed by their own id; `entry update` replaces the value and bumps the version.
 - Workflow node entries: written by Push to Dataset through one reused `workflow_node` source per Dataset; their keys identify the producing Workflow Run, node, and array index. Repeating the same run/node/index reuses the entry; a separate run has distinct keys. See [workflow/push-to-dataset.md](workflow/push-to-dataset.md).
@@ -138,11 +138,20 @@ Read the selected command's `--help` before composing any `snowflake` command. H
 | --- | --- |
 | Check a query and see sample rows before importing it | `freckle workbook dataset snowflake preview` |
 | Import a query's whole result into an existing Dataset, once | `freckle workbook dataset snowflake import` |
+| Keep an existing Dataset holding the same rows as one Snowflake table or view | `freckle workbook dataset snowflake mirror create` |
+| Apply the rows added to and deleted from a mirrored table now, ahead of its schedule | `freckle workbook dataset snowflake mirror refresh` |
+| See or change the schedule a mirror refreshes on | `freckle workbook dataset snowflake mirror schedule get\|set` |
 
 - Get the Snowflake credential ID with `freckle connections show snowflake --org-id <org-id>`. The connection itself is created in Freckle's web app.
 - **Query preview gate:** write the query to an absolute file and run `snowflake preview` on that exact file until it exits 0 and the columns and rows match the goal; only then run `snowflake import` with the same file. Zero rows is a valid preview: tell the user it matched nothing.
 - The query runs on the customer's own Snowflake warehouse, at their cost. Select only the columns and rows the user approved; never guess a table.
 - `snowflake import` writes into an existing Dataset (create one with `workbook dataset create`), returns at once, and does not refresh later. Wait for it with `workbook dataset source list` until the source's `config.import.status` is `done` or `failed` before relying on its entries.
+
+- **Mirror or import:** use `snowflake import` for a one-time copy of any query. Use a mirror only when the user wants the Dataset to follow which rows one table or view holds over time: rows added there are added and rows deleted there are deleted. A row edited there keeps the values it was added with, so say so when the user expects edits to arrive. It takes a table name, not a query.
+- **Mirror setup the user does in Snowflake first:** the table's owner enables change tracking (`ALTER TABLE <table> SET CHANGE_TRACKING = TRUE`). `mirror create` refuses a table without it and says so; relay that statement to the user instead of retrying.
+- `mirror create` loads every row once. Wait for it like an import, with `workbook dataset source list` until `config.import.status` is `done`, before the first `mirror refresh`.
+- `mirror refresh` returns at once. Wait with `workbook dataset source list` until `config.snowflake.mirror.refresh.status` is `done` or `failed`. A mirror also refreshes by itself: every hour (UTC) unless `mirror create` was given `--schedule` with `--time-zone`. `mirror schedule get` shows the next run and whether the schedule is disabled; `mirror schedule set` changes it (at most once an hour) or switches it back on. A mirror always has a schedule; there is no way to remove it. Every refresh runs a query on the user's warehouse and automatic connections run the rows it adds, so agree the schedule with the user before creating a mirror.
+- Snowflake keeps a table's changes for its data retention period, 1 day unless the user raised it. A refresh after a longer gap fails and the mirror must be created again, so keep the schedule's gap shorter than that retention.
 
 - [ ] `snowflake preview` exited 0 on the query file, and its columns and sample rows were checked against what the user approved.
 - [ ] `snowflake import` ran with that same file, unchanged since the preview.

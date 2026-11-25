@@ -62,6 +62,8 @@ Otherwise an observed forecast requires actual sample credits for those 10 rows,
 
 Label this as a sample-based forecast, not a guarantee. Use the per-run total as the observed-spend source; outputs, selected branches, catalog maximums, and a zero lower bound remain planning context.
 
+Provider results are cached per workspace for 30 days: a step that repeats a lookup from the last 30 days returns the earlier result, charges no credits, and makes no fresh provider call. When the `runs watch` summary prints a **Cached results** line (or a step shows `cached: true`), tell the user how many steps were served from cache at no charge, and do not treat that sample as the real cost; forecast from rows that have never run. Re-running rows already run checks the wiring, not provider cost or freshness.
+
 When exact Run evidence is unavailable, apply the aggregate fallback in `CREDITS.md`. If no baseline was captured, the aggregate has not recorded the sample, or unrelated work shares the report scope, the **Credit Forecast Summary** states that trustworthy sample attribution is unavailable, then repeats the planning maximum for context and labels it as a maximum rather than an observed forecast.
 
 ## Dollar equivalents
